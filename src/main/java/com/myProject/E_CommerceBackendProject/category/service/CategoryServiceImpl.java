@@ -9,6 +9,7 @@ import com.myProject.E_CommerceBackendProject.category.dto.CategoryDto;
 import com.myProject.E_CommerceBackendProject.category.entity.Category;
 import com.myProject.E_CommerceBackendProject.category.repository.CategoryRepository;
 import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
+import com.myProject.E_CommerceBackendProject.product.dto.ProductDto;
 
 import lombok.RequiredArgsConstructor;
 
