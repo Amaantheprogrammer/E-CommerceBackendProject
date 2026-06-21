@@ -38,6 +38,14 @@ public class CategoryServiceImpl implements CategoryService {
         return mapToDto(categoryRepository.save(category));
     }
 
+    @Override
+    public CategoryDto updateCategory(Long id, NewCategoryDto newCategoryDto) {
+        Category category = categoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + id));
+        category.setName(newCategoryDto.getName());
+        return mapToDto(categoryRepository.save(category));
+    }
+
     private CategoryDto mapToDto(Category category) {
         return CategoryDto.builder()
                     .id(category.getId())
