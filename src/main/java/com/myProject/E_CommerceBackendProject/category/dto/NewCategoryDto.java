@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class NewCategoryDto {
-    @NotBlank
+    @NotBlank(message = "Name field is required")
     private String name;
-    private String description;
 }
