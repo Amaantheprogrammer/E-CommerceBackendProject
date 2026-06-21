@@ -31,12 +31,6 @@ public class CategoryServiceImpl implements CategoryService {
         return mapToDto(category);
     }
 
-    @Override
-    public CategoryDto getCategoryByNameIgnoreCase(String name) {
-        Category category = categoryRepository.findByNameIgnoreCase(name);
-        return mapToDto(category);
-    }
-
     private CategoryDto mapToDto(Category category) {
         return CategoryDto.builder()
                     .id(category.getId())

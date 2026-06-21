@@ -9,6 +9,4 @@ public interface CategoryService {
 
     CategoryDto getCategoryById(Long id);
 
-    CategoryDto getCategoryByNameIgnoreCase(String name);
-
 }
