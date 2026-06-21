@@ -23,39 +23,40 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    
+
     @Override
     public Page<ProductDto> getAllProducts(Pageable pageable) {
         return productRepository.findAllWithCategory(pageable).map(this::mapToDto);
     }
-    
+
     @Override
     public ProductDto getProductById(Long id) {
         Product product = productRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
         return mapToDto(product);
     }
-    
+
     @Override
     public List<ProductDto> getProductByNameContainingIgnoreCase(String name) {
         List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
         return products.stream().map(this::mapToDto).toList();
     }
-    
+
     @Override
     public List<ProductDto> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
         List<Product> products = productRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price);
         return products.stream().map(this::mapToDto).toList();
     }
-    
-     @Override
-    public List<ProductDto> getProductsByCategoryId(Long id) {
-        if(!categoryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Category not found with ID: " + id);
-        }
-        List<Product> products = productRepository.findProductsByCategoryId(id);
-        return products.stream().map(this::mapToDto).toList();
 
+    @Override
+    public List<ProductDto> getProductsByCategoryIdAndPriceLessThan(Long categoryId, BigDecimal price) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new ResourceNotFoundException("Category not found with ID: " + categoryId);
+        }
+        List<Product> products = (price != null)
+                ? productRepository.findByCategoryIdAndPriceLessThan(categoryId, price)
+                : productRepository.findProductsByCategoryId(categoryId);
+        return products.stream().map(this::mapToDto).toList();
     }
 
     @Override
@@ -72,7 +73,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(category)
                 .build();
         // Save in database as product and return productDto
-        return mapToDto(productRepository.save(product));    
+        return mapToDto(productRepository.save(product));
     }
 
     private ProductDto mapToDto(Product product) {

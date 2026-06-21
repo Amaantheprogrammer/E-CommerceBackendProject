@@ -19,7 +19,7 @@ public interface ProductService {
 
     List<ProductDto> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price);
 
-    List<ProductDto> getProductsByCategoryId(Long id);
+    List<ProductDto> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price);
 
     ProductDto createNewProduct(NewProductDto newProductDto);
 

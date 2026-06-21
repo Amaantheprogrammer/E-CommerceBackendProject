@@ -52,8 +52,8 @@ public class ProductController {
     }
     
     @GetMapping("/category/{id}")
-    public ResponseEntity<List<ProductDto>> getProductsByCategoryId(@RequestBody Long id) {
-        return ResponseEntity.ok(productService.getProductsByCategoryId(id));
+    public ResponseEntity<List<ProductDto>> getProductsByCategoryId(@PathVariable Long id, @RequestParam(required = false) BigDecimal price) {
+        return ResponseEntity.ok(productService.getProductsByCategoryIdAndPriceLessThan(id, price));
     }
 
     @PostMapping
