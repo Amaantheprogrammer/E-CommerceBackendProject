@@ -67,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     public List<ProductDto> getProductsByCategoryId(Long id) {
-        if(!categoryRepository.findById(id)) {
+        if(!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category not found with ID: " + id);
         }
         List<Product> products = productRepository.findProductsByCategoryId(id);
