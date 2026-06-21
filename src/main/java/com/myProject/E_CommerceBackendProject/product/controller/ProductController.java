@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController // REST API usage
 @RequiredArgsConstructor // Objects with "final" keyword get added to the constructor
-@RequestMapping("products") // Adds "products" to every http
+@RequestMapping("products") // Adds "products" to every http link
 public class ProductController {
     
     private final ProductService productService;
