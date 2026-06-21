@@ -25,4 +25,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByNameContainingIgnoreCaseAndPriceLessThan(@Param("name")
         String name, @Param("price") BigDecimal price);
     
+    @Query("SELECT p FROM Product p JOIN FETCH p.category WHERE p.category.id = :id")
+    List<Product> findProductsByCategoryId(@Param("id") Long id);
+    
 }

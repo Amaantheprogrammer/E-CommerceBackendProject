@@ -21,5 +21,5 @@ public interface ProductService {
 
     ProductDto createNewProduct(NewProductDto newProductDto);
 
-    
+    List<ProductDto> getProductsByCategoryId(Long id);
 }

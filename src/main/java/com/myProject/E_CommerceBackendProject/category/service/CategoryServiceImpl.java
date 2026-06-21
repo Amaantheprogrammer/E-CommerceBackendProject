@@ -9,7 +9,6 @@ import com.myProject.E_CommerceBackendProject.category.dto.CategoryDto;
 import com.myProject.E_CommerceBackendProject.category.entity.Category;
 import com.myProject.E_CommerceBackendProject.category.repository.CategoryRepository;
 import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
-import com.myProject.E_CommerceBackendProject.product.dto.ProductDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,11 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto getCategoryByNameIgnoreCase(String name) {
         Category category = categoryRepository.findByNameIgnoreCase(name);
         return mapToDto(category);
-    }
-
-    @Override
-    public List<ProductDto> getAllProductsByCategoryId(Long id) {
-        return null;
     }
 
     private CategoryDto mapToDto(Category category) {

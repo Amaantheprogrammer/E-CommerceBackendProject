@@ -64,6 +64,16 @@ public class ProductServiceImpl implements ProductService {
         // Save in database as product and return productDto
         return mapToDto(productRepository.save(product));    
     }
+    
+    @Override
+    public List<ProductDto> getProductsByCategoryId(Long id) {
+        if(!categoryRepository.findById(id)) {
+            throw new ResourceNotFoundException("Category not found with ID: " + id);
+        }
+        List<Product> products = productRepository.findProductsByCategoryId(id);
+        return products.stream().map(this::mapToDto).toList();
+
+    }
 
     private ProductDto mapToDto(Product product) {
         return ProductDto.builder()
