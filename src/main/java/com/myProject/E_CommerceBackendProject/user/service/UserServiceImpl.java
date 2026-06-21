@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
         return mapToDto(user);
     }
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUserById(Long id) {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found with ID: " + id);
         }
