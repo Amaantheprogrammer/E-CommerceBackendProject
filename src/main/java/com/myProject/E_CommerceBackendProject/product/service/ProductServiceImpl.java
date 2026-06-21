@@ -12,6 +12,7 @@ import com.myProject.E_CommerceBackendProject.category.repository.CategoryReposi
 import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
 import com.myProject.E_CommerceBackendProject.product.dto.NewProductDto;
 import com.myProject.E_CommerceBackendProject.product.dto.ProductDto;
+import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductDto;
 import com.myProject.E_CommerceBackendProject.product.entity.Product;
 import com.myProject.E_CommerceBackendProject.product.repository.ProductRepository;
 
@@ -49,13 +50,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> getProductsByCategoryIdAndPriceLessThan(Long categoryId, BigDecimal price) {
-        if (!categoryRepository.existsById(categoryId)) {
-            throw new ResourceNotFoundException("Category not found with ID: " + categoryId);
+    public List<ProductDto> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price) {
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Category not found with ID: " + id);
         }
         List<Product> products = (price != null)
-                ? productRepository.findByCategoryIdAndPriceLessThan(categoryId, price)
-                : productRepository.findProductsByCategoryId(categoryId);
+                ? productRepository.findByCategoryIdAndPriceLessThan(id, price)
+                : productRepository.findProductsByCategoryId(id);
         return products.stream().map(this::mapToDto).toList();
     }
 
@@ -74,6 +75,37 @@ public class ProductServiceImpl implements ProductService {
                 .build();
         // Save in database as product and return productDto
         return mapToDto(productRepository.save(product));
+    }
+    
+    
+    @Override
+    public ProductDto updateProduct(Long id, UpdateProductDto updateProductDto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        product.setName(updateProductDto.getName());
+        product.setPrice(updateProductDto.getPrice());
+        product.setDescription(updateProductDto.getDescription());
+        product.setStockQuantity(updateProductDto.getStockQuantity());
+        return mapToDto(productRepository.save(product));
+    }
+    
+    @Override
+    public ProductDto updatePartialProduct(Long id, UpdateProductDto updateProductDto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        if (updateProductDto.getName() != null) product.setName(updateProductDto.getName());
+        if (updateProductDto.getPrice() != null) product.setPrice(updateProductDto.getPrice());
+        if (updateProductDto.getDescription() != null) product.setDescription(updateProductDto.getDescription());
+        if (updateProductDto.getStockQuantity() != null) product.setStockQuantity(updateProductDto.getStockQuantity());
+        return mapToDto(productRepository.save(product));
+    }
+    
+    @Override
+    public void deleteProductById(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product not found with ID: " + id);
+        }
+        productRepository.deleteById(id);
     }
 
     private ProductDto mapToDto(Product product) {

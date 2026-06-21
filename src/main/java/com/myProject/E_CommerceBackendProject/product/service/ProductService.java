@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.myProject.E_CommerceBackendProject.product.dto.NewProductDto;
 import com.myProject.E_CommerceBackendProject.product.dto.ProductDto;
+import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductDto;
 
 public interface ProductService {
 
@@ -22,5 +23,11 @@ public interface ProductService {
     List<ProductDto> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price);
 
     ProductDto createNewProduct(NewProductDto newProductDto);
+
+    ProductDto updateProduct(Long id, UpdateProductDto updateProductDto);
+
+    ProductDto updatePartialProduct(Long id, UpdateProductDto updateProductDto);
+
+    void deleteProductById(Long id);
 
 }
