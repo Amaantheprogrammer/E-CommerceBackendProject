@@ -43,12 +43,17 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> searchProducts(@RequestParam String name, @RequestParam(required = false) BigDecimal price) {
         /*
         GET /products/search?name=phone              → name search only
-        GET /products/search?name=phone&maxPrice=500 → name + price filter
+        GET /products/search?name=phone&price=500 → name + price filter
         */
         if (price != null) {
             return ResponseEntity.ok(productService.getProductByNameContainingIgnoreCaseAndPriceLessThan(name, price));
         }
         return ResponseEntity.ok(productService.getProductByNameContainingIgnoreCase(name));
+    }
+    
+    @GetMapping("/category/{id}")
+    public ResponseEntity<List<ProductDto>> getProductsByCategoryId(@RequestBody Long id) {
+        return ResponseEntity.ok(productService.getProductsByCategoryId(id));
     }
 
     @PostMapping
