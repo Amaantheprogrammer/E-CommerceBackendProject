@@ -13,6 +13,7 @@ import com.myProject.E_CommerceBackendProject.user.entity.Role;
 import com.myProject.E_CommerceBackendProject.user.entity.User;
 import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service // Service layer or Business logic
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
+    @Transactional
     public UserDto createNewUser(NewUserDto newUserDto) {
         User user = User.builder()
                         .name(newUserDto.getName())
@@ -46,6 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateUser(Long id, UpdateUserDto updateUserDto) {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
@@ -55,6 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updatePartialUser(Long id, UpdateUserDto updateUserDto) {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
@@ -62,7 +66,9 @@ public class UserServiceImpl implements UserService {
         if (updateUserDto.getEmail() != null) user.setEmail(updateUserDto.getEmail());
         return mapToDto(user);
     }
+
     @Override
+    @Transactional
     public void deleteUserById(Long id) {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found with ID: " + id);
@@ -71,6 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteAllUsers() {
         if (userRepository.count() == 0) {
             throw new ResourceNotFoundException("Database is empty");

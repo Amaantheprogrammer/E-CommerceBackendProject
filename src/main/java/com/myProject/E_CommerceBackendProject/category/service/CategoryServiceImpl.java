@@ -11,6 +11,7 @@ import com.myProject.E_CommerceBackendProject.category.entity.Category;
 import com.myProject.E_CommerceBackendProject.category.repository.CategoryRepository;
 import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,12 +34,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
+    @Transactional
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
         Category category = Category.builder().name(newCategoryDto.getName()).build();
         return mapToDto(categoryRepository.save(category));
     }
 
     @Override
+    @Transactional
     public CategoryDto updateCategory(Long id, NewCategoryDto newCategoryDto) {
         Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + id));
