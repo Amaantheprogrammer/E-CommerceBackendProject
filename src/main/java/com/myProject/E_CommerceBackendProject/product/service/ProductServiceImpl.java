@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.myProject.E_CommerceBackendProject.category.entity.Category;
 import com.myProject.E_CommerceBackendProject.category.repository.CategoryRepository;
@@ -26,11 +27,13 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductDto> getAllProducts(Pageable pageable) {
         return productRepository.findAllWithCategory(pageable).map(this::mapToDto);
     }
-
+    
     @Override
+    @Transactional(readOnly = true)
     public ProductDto getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
@@ -38,18 +41,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductDto> getProductByNameContainingIgnoreCase(String name) {
         List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
         return products.stream().map(this::mapToDto).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductDto> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
         List<Product> products = productRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price);
         return products.stream().map(this::mapToDto).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductDto> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price) {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category not found with ID: " + id);
@@ -61,6 +67,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDto createNewProduct(NewProductDto newProductDto) {
         // Check if category exists by id and store it in an object
         Category category = categoryRepository.findById(newProductDto.getCategoryId())
@@ -79,6 +86,7 @@ public class ProductServiceImpl implements ProductService {
     
     
     @Override
+    @Transactional
     public ProductDto updateProduct(Long id, UpdateProductDto updateProductDto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
@@ -90,6 +98,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional
     public ProductDto updatePartialProduct(Long id, UpdateProductDto updateProductDto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
@@ -101,6 +110,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional
     public void deleteProductById(Long id) {
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product not found with ID: " + id);
