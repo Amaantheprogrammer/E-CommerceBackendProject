@@ -3,8 +3,6 @@ package com.myProject.E_CommerceBackendProject.cart.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.myProject.E_CommerceBackendProject.cart.dto.CartItemDto;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
