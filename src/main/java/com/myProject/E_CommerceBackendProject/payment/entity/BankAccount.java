@@ -29,7 +29,7 @@ public class BankAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(nullable = false, precision = 12, scale = 2) // At most 12 digits with 2 decimal place 
     private BigDecimal balance;
 
     @OneToOne
