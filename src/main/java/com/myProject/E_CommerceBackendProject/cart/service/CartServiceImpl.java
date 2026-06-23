@@ -11,8 +11,8 @@ import com.myProject.E_CommerceBackendProject.cart.dto.CartItemDto;
 import com.myProject.E_CommerceBackendProject.cart.entity.Cart;
 import com.myProject.E_CommerceBackendProject.cart.entity.CartItem;
 import com.myProject.E_CommerceBackendProject.cart.repository.CartRepository;
-import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
 import com.myProject.E_CommerceBackendProject.exception.BadRequestException;
+import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
 import com.myProject.E_CommerceBackendProject.product.entity.Product;
 import com.myProject.E_CommerceBackendProject.product.repository.ProductRepository;
 import com.myProject.E_CommerceBackendProject.user.entity.User;
@@ -28,6 +28,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+
 
     @Override
     public CartDto getCartByUserId(Long userId) {
@@ -52,9 +53,11 @@ public class CartServiceImpl implements CartService {
             throw new BadRequestException("Insufficient stock for product: " + product.getName());
         }
         // Check if cart already exists otherwise create it
-        Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseGet(() -> Cart.builder().user(user).build());
-        // 
+        Cart cart = user.getCart();
+        if (cart == null) {
+            cart = Cart.builder().user(user).build();
+            user.setCart(cart);
+        }
         Optional<CartItem> existingItem = cart.getCartItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst();
@@ -69,7 +72,33 @@ public class CartServiceImpl implements CartService {
                     .build();
             cart.getCartItems().add(newItem);
         }
-        return null;
+        return mapToDto(cartRepository.save(cart));
+    }
+
+    @Override
+    @Transactional
+    public void removeProductFromCart(Long userId, Long productId) {
+        User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        // Check if product exists
+        if (!productRepository.existsById(productId)) {
+            throw new ResourceNotFoundException("Product not found with ID: " + productId);
+        }
+        Cart cart = user.getCart();
+        if (cart == null) {
+            cart = Cart.builder().user(user).build();
+            user.setCart(cart);
+        }
+        Optional<CartItem> itemToRemove = cart.getCartItems()
+                .stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst();
+        if (itemToRemove.isPresent()) {
+            cart.getCartItems().remove(itemToRemove.get());
+        } else {
+            throw new ResourceNotFoundException("Product not found with ID: " + productId);
+        }
+        cartRepository.save(cart);
     }
     
     // Conversion to DTO (Data Transfer Object)
