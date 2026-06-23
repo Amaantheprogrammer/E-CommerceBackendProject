@@ -1,9 +1,9 @@
 package com.myProject.E_CommerceBackendProject.cart.service;
 
-import com.myProject.E_CommerceBackendProject.product.entity.Product;
+import com.myProject.E_CommerceBackendProject.cart.dto.CartItemDto;
 
 public interface CartService {
-    void addProduct(Product product);
+    CartItemDto addToCart(CartItemDto cartItemDto);
 
-    void removeProduct(Product product);
+    void removeFromCart(CartItemDto cartItemDto);
 }

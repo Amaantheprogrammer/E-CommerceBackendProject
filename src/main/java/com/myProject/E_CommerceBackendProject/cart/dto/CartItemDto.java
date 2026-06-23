@@ -1,9 +1,6 @@
 package com.myProject.E_CommerceBackendProject.cart.dto;
 
 import java.math.BigDecimal;
-import java.util.List;
-
-import com.myProject.E_CommerceBackendProject.cart.entity.CartItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CartDto {
+public class CartItemDto {
     private Long id;
-    private Long userId;
-    private String userName;
-    private List<CartItem> items;
-    private BigDecimal total;
+    private Long cartId;
+    private Long productId;
+    private Integer quantity;
+    private BigDecimal subtotal;
 }
