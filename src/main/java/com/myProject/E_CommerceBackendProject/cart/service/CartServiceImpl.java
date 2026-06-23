@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.myProject.E_CommerceBackendProject.cart.dto.CartDto;
 import com.myProject.E_CommerceBackendProject.cart.dto.CartItemDto;
@@ -18,7 +19,6 @@ import com.myProject.E_CommerceBackendProject.product.repository.ProductReposito
 import com.myProject.E_CommerceBackendProject.user.entity.User;
 import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,11 +29,11 @@ public class CartServiceImpl implements CartService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-
     @Override
+    @Transactional(readOnly = true)
     public CartDto getCartByUserId(Long userId) {
         User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
         Cart cart = user.getCart();
         if (cart == null) {
             cart = Cart.builder().user(user).build();
@@ -44,7 +44,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartDto addProductToCart(Long userId, Long productId, Integer quantity) {
+    public CartDto updateItemQuantity(Long userId, Long productId, Integer quantity) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
         Product product = productRepository.findById(productId)
@@ -59,7 +59,7 @@ public class CartServiceImpl implements CartService {
                 .findFirst();
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
-            int newQuantity = item.getQuantity() + quantity; 
+            int newQuantity = item.getQuantity() + quantity;
             if (newQuantity <= 0) {
                 cart.getCartItems().remove(item);
             } else {
@@ -89,29 +89,25 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public void removeProductFromCart(Long userId, Long productId) {
         User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-        // Check if product exists
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));      
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product not found with ID: " + productId);
-        }
+        }     
         Cart cart = user.getCart();
-        if (cart == null) {
-            cart = Cart.builder().user(user).build();
-            user.setCart(cart);
+        if (cart == null || cart.getCartItems().isEmpty()) {
+            throw new ResourceNotFoundException("Cart is empty or does not exist for user ID: " + userId);
         }
-        Optional<CartItem> itemToRemove = cart.getCartItems()
-                .stream()
+        Optional<CartItem> itemToRemove = cart.getCartItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst();
         if (itemToRemove.isPresent()) {
             cart.getCartItems().remove(itemToRemove.get());
         } else {
-            throw new ResourceNotFoundException("Product not found with ID: " + productId);
+            throw new ResourceNotFoundException("Product with ID: " + productId + " is not inside this cart");
         }
         cartRepository.save(cart);
     }
-    
-    // Conversion to DTO (Data Transfer Object)
+
     private CartItemDto cartItemToDto(CartItem cartItem) {
         return CartItemDto.builder()
                 .id(cartItem.getId())
@@ -128,15 +124,14 @@ public class CartServiceImpl implements CartService {
         List<CartItemDto> cartItemDtos = cart.getCartItems().stream().map(this::cartItemToDto).toList();
 
         BigDecimal total = cartItemDtos.stream()
-                                    .map(CartItemDto::getSubtotal)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(CartItemDto::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         return CartDto.builder()
-                    .id(cart.getId())
-                    .userId(cart.getUser().getId())
-                    .userName(cart.getUser().getName())
-                    .cartItems(cartItemDtos)
-                    .total(total)
-                    .build();
+                .id(cart.getId())
+                .userId(cart.getUser().getId())
+                .userName(cart.getUser().getName())
+                .cartItems(cartItemDtos)
+                .total(total)
+                .build();
     }
-
 }

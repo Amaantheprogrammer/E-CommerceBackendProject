@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AddToCartDto {
+public class UpdateCartDto {
     private Long userId;
     private Long productId;
     private Integer quantity;

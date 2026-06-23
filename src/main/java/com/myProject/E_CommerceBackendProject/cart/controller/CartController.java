@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.cart.dto.AddToCartDto;
 import com.myProject.E_CommerceBackendProject.cart.dto.CartDto;
+import com.myProject.E_CommerceBackendProject.cart.dto.UpdateCartDto;
 import com.myProject.E_CommerceBackendProject.cart.service.CartService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,8 +28,8 @@ public class CartController {
     }
     
     @PostMapping("/items")
-    public ResponseEntity<CartDto> addProductToCart(@RequestBody AddToCartDto request) {
-        CartDto updatedCart = cartService.addProductToCart(request.getUserId(), request.getProductId(), request.getQuantity());
+    public ResponseEntity<CartDto> updateItemQuantity(@RequestBody UpdateCartDto request) {
+        CartDto updatedCart = cartService.updateItemQuantity(request.getUserId(), request.getProductId(), request.getQuantity());
         return ResponseEntity.ok(updatedCart);
     }
 
