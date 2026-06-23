@@ -46,13 +46,9 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public CartDto addProductToCart(Long userId, Long productId, Integer quantity) {
         User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
         Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
-        if (product.getStockQuantity() < quantity) {
-            throw new BadRequestException("Insufficient stock for product: " + product.getName());
-        }
-        // Check if cart already exists otherwise create it
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
         Cart cart = user.getCart();
         if (cart == null) {
             cart = Cart.builder().user(user).build();
@@ -61,10 +57,24 @@ public class CartServiceImpl implements CartService {
         Optional<CartItem> existingItem = cart.getCartItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst();
-
         if (existingItem.isPresent()) {
-            existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
+            CartItem item = existingItem.get();
+            int newQuantity = item.getQuantity() + quantity; 
+            if (newQuantity <= 0) {
+                cart.getCartItems().remove(item);
+            } else {
+                if (product.getStockQuantity() < newQuantity) {
+                    throw new BadRequestException("Insufficient stock for product: " + product.getName());
+                }
+                item.setQuantity(newQuantity);
+            }
         } else {
+            if (quantity <= 0) {
+                throw new BadRequestException("Initial product quantity must be greater than zero.");
+            }
+            if (product.getStockQuantity() < quantity) {
+                throw new BadRequestException("Insufficient stock for product: " + product.getName());
+            }
             CartItem newItem = CartItem.builder()
                     .product(product)
                     .cart(cart)

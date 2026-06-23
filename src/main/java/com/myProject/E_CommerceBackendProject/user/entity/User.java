@@ -46,4 +46,8 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     @ToString.Exclude
     private Cart cart;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentMethod paymentMethod;
 }
