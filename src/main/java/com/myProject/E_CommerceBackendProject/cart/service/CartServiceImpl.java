@@ -1,27 +1,103 @@
 package com.myProject.E_CommerceBackendProject.cart.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
+import com.myProject.E_CommerceBackendProject.cart.dto.CartDto;
 import com.myProject.E_CommerceBackendProject.cart.dto.CartItemDto;
+import com.myProject.E_CommerceBackendProject.cart.entity.Cart;
+import com.myProject.E_CommerceBackendProject.cart.entity.CartItem;
 import com.myProject.E_CommerceBackendProject.cart.repository.CartRepository;
+import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
+import com.myProject.E_CommerceBackendProject.exception.BadRequestException;
+import com.myProject.E_CommerceBackendProject.product.entity.Product;
+import com.myProject.E_CommerceBackendProject.product.repository.ProductRepository;
+import com.myProject.E_CommerceBackendProject.user.entity.User;
+import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
+
     private final CartRepository cartRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     @Override
-    public CartItemDto addToCart(CartItemDto cartItemDto) {
+    public CartDto getCartByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        Cart cart = user.getCart();
+        if (cart == null) {
+            cart = Cart.builder().user(user).build();
+            cart = cartRepository.save(cart);
+        }
+        return mapToDto(cart);
+    }
 
+    @Override
+    @Transactional
+    public CartDto addProductToCart(Long userId, Long productId, Integer quantity) {
+        User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+        if (product.getStockQuantity() < quantity) {
+            throw new BadRequestException("Insufficient stock for product: " + product.getName());
+        }
+        // Check if cart already exists otherwise create it
+        Cart cart = cartRepository.findByUser_Id(userId)
+                .orElseGet(() -> Cart.builder().user(user).build());
+        // 
+        Optional<CartItem> existingItem = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
+        } else {
+            CartItem newItem = CartItem.builder()
+                    .product(product)
+                    .cart(cart)
+                    .quantity(quantity)
+                    .build();
+            cart.getCartItems().add(newItem);
+        }
         return null;
     }
-
-    @Override
-    public void removeFromCart(CartItemDto cartItemDto) {
-        
+    
+    // Conversion to DTO (Data Transfer Object)
+    private CartItemDto cartItemToDto(CartItem cartItem) {
+        return CartItemDto.builder()
+                .id(cartItem.getId())
+                .cartId(cartItem.getCart().getId())
+                .productId(cartItem.getProduct().getId())
+                .productName(cartItem.getProduct().getName())
+                .productPrice(cartItem.getProduct().getPrice())
+                .quantity(cartItem.getQuantity())
+                .subtotal(cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())))
+                .build();
     }
 
-   
+    private CartDto mapToDto(Cart cart) {
+        List<CartItemDto> cartItemDtos = cart.getCartItems().stream().map(this::cartItemToDto).toList();
+
+        BigDecimal total = cartItemDtos.stream()
+                                    .map(CartItemDto::getSubtotal)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return CartDto.builder()
+                    .id(cart.getId())
+                    .userId(cart.getUser().getId())
+                    .userName(cart.getUser().getName())
+                    .cartItems(cartItemDtos)
+                    .total(total)
+                    .build();
+    }
+
 }

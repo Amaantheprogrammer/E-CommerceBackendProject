@@ -1,9 +1,11 @@
 package com.myProject.E_CommerceBackendProject.cart.service;
 
-import com.myProject.E_CommerceBackendProject.cart.dto.CartItemDto;
+import com.myProject.E_CommerceBackendProject.cart.dto.CartDto;
 
 public interface CartService {
-    CartItemDto addToCart(CartItemDto cartItemDto);
 
-    void removeFromCart(CartItemDto cartItemDto);
+    CartDto getCartByUserId(Long userId);
+
+    CartDto addProductToCart(Long userId, Long productId, Integer quantity);
+    
 }

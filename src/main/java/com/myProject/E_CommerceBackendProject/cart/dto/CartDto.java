@@ -3,7 +3,7 @@ package com.myProject.E_CommerceBackendProject.cart.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.myProject.E_CommerceBackendProject.cart.entity.CartItem;
+import com.myProject.E_CommerceBackendProject.cart.dto.CartItemDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +18,6 @@ public class CartDto {
     private Long id;
     private Long userId;
     private String userName;
-    private List<CartItem> items;
+    private List<CartItemDto> cartItems;
     private BigDecimal total;
 }
