@@ -27,8 +27,25 @@ A robust, enterprise-grade RESTful API backend built using **Java** and the **Sp
 
 ```text
 src/main/java/com/myProject/E_CommerceBackendProject/
-│
-├── product/
+│── cart/
+│   ├── controller/     
+│   ├── dto/           
+│   ├── entity/          
+│   ├── repository/      
+│   └── service/
+│── category/
+│   ├── controller/     
+│   ├── dto/           
+│   ├── entity/          
+│   ├── repository/      
+│   └── service/
+│── product/
+│   ├── controller/     
+│   ├── dto/           
+│   ├── entity/          
+│   ├── repository/      
+│   └── service/   
+├── user/
 │   ├── controller/      # REST API Controllers (Exposing endpoints)
 │   ├── dto/             # Data Transfer Objects (Request/Response payloads)
 │   ├── entity/          # JPA Hibernate Domain Models (Database Tables)
