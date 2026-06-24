@@ -122,3 +122,15 @@ INSERT INTO products (name, description, price, stock_quantity, category_id, cre
 ('Baby Stroller Foldable', 'Lightweight stroller with adjustable canopy.', 5999.00, 15, 19, NOW(), NOW()),
 ('Digital BP Monitor', 'Automatic blood pressure monitor with memory.', 1899.00, 35, 20, NOW(), NOW()),
 ('Multivitamin Tablets 60ct', 'Daily multivitamin for immunity and energy.', 549.00, 120, 20, NOW(), NOW());
+
+-- Set Users 1, 2, 4, 5, 7, and 8 to Cash on Delivery
+UPDATE users SET payment_method = 'CASH_ON_DELIVERY' WHERE id IN (1, 2, 4, 5, 7, 8);
+
+-- Set Users 3, 6, 9, and 10 to Bank Transfer
+UPDATE users SET payment_method = 'BANK_TRANSFER' WHERE id IN (3, 6, 9, 10);
+
+INSERT INTO bank_accounts (balance, user_id) VALUES
+(12500.50, 3),   -- Rahul Verma (Healthy balance)
+(3200.00, 6),    -- Ananya Reddy (Low balance to test transaction failures)
+(8500.75, 9),    -- Arjun Nair (Standard balance)
+(25000.00, 10);  -- Divya Pillai (Premium balance)

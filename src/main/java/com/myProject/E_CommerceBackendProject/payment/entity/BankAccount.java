@@ -33,7 +33,7 @@ public class BankAccount {
     private BigDecimal balance;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     @ToString.Exclude
     private User user;
 }

@@ -1,6 +1,7 @@
 package com.myProject.E_CommerceBackendProject.user.entity;
 
 import com.myProject.E_CommerceBackendProject.cart.entity.Cart;
+import com.myProject.E_CommerceBackendProject.payment.entity.BankAccount;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,4 +51,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
+
+    @OneToOne(mappedBy = "user")
+    private BankAccount bankAccount;
 }
