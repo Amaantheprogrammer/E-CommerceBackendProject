@@ -87,7 +87,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void removeProductFromCart(Long userId, Long productId) {
+    public CartDto removeProductFromCart(Long userId, Long productId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));      
         if (!productRepository.existsById(productId)) {
@@ -106,6 +106,7 @@ public class CartServiceImpl implements CartService {
             throw new ResourceNotFoundException("Product with ID: " + productId + " is not inside this cart");
         }
         cartRepository.save(cart);
+        return mapToDto(cart);
     }
 
     private CartItemDto cartItemToDto(CartItem cartItem) {

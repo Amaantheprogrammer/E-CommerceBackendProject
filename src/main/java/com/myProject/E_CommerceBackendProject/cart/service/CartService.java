@@ -8,6 +8,6 @@ public interface CartService {
 
     CartDto updateItemQuantity(Long userId, Long productId, Integer quantity);
 
-    void removeProductFromCart(Long userId, Long productId);
+    CartDto removeProductFromCart(Long userId, Long productId);
     
 }
