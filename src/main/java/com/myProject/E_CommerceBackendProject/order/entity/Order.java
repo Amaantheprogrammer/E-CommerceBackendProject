@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.myProject.E_CommerceBackendProject.user.entity.PaymentMethod;
 import com.myProject.E_CommerceBackendProject.user.entity.User;
 
 import jakarta.persistence.CascadeType;
