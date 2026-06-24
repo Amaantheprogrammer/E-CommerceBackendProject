@@ -105,10 +105,21 @@ public class CartServiceImpl implements CartService {
         } else {
             throw new ResourceNotFoundException("Product with ID: " + productId + " is not inside this cart");
         }
+        return mapToDto(cartRepository.save(cart));
+    }
+    
+    @Override
+    @Transactional
+    public void clearCart(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        Cart cart = user.getCart();
+        if (cart == null || cart.getCartItems().isEmpty()) return;
+        cart.getCartItems().clear();
         cartRepository.save(cart);
-        return mapToDto(cart);
     }
 
+    // Mapping to DTO
     private CartItemDto cartItemToDto(CartItem cartItem) {
         return CartItemDto.builder()
                 .id(cartItem.getId())
