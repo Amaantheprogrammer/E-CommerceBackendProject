@@ -134,3 +134,22 @@ INSERT INTO bank_accounts (balance, user_id) VALUES
 (3200.00, 6),    -- Ananya Reddy (Low balance to test transaction failures)
 (8500.75, 9),    -- Arjun Nair (Standard balance)
 (25000.00, 10);  -- Divya Pillai (Premium balance)
+
+INSERT INTO users (id, name, email, password, role, payment_method) VALUES
+(1, 'Amaan Sheikh', 'amaan@example.com', 'pass', 'ROLE_ADMIN', 'CASH_ON_DELIVERY'),
+(2, 'Priya Sharma', 'priya.sharma@example.com', 'pass', 'ROLE_USER', 'CASH_ON_DELIVERY'),
+(3, 'Rahul Verma', 'rahul.verma@example.com', 'pass', 'ROLE_USER', 'BANK_TRANSFER'),
+(4, 'Sneha Iyer', 'sneha.iyer@example.com', 'pass', 'ROLE_USER', 'CASH_ON_DELIVERY'),
+(5, 'Karan Mehta', 'karan.mehta@example.com', 'pass', 'ROLE_USER', 'CASH_ON_DELIVERY'),
+(6, 'Ananya Reddy', 'ananya.reddy@example.com', 'pass', 'ROLE_USER', 'BANK_TRANSFER'),
+(7, 'Vikram Singh', 'vikram.singh@example.com', 'pass', 'ROLE_USER', 'CASH_ON_DELIVERY'),
+(8, 'Neha Gupta', 'neha.gupta@example.com', 'pass', 'ROLE_USER', 'CASH_ON_DELIVERY'),
+(9, 'Arjun Nair', 'arjun.nair@example.com', 'pass', 'ROLE_USER', 'BANK_TRANSFER'),
+(10, 'Divya Pillai', 'divya.pillai@example.com', 'pass', 'ROLE_USER', 'BANK_TRANSFER');
+
+INSERT INTO bank_accounts (id, balance, user_id) VALUES
+(1, 12500.50, 3),
+(2, 3200.00, 6),
+(3, 8500.75, 9),
+(4, 25000.00, 10);
+
