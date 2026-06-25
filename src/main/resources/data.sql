@@ -153,3 +153,8 @@ INSERT INTO bank_accounts (id, balance, user_id) VALUES
 (3, 8500.75, 9),
 (4, 25000.00, 10);
 
+UPDATE users 
+SET password = '$2a$10$vMvyX9Y9E.eXU.LCOEksEuQvqyL.23qK9lZOnYc880R8BwFzW7a2y' 
+WHERE email = 'amaan@example.com';
+
+COMMIT;
