@@ -58,4 +58,15 @@ public class Order {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime orderDate;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    @Builder.Default
+    private OrderStatus orderStatus = OrderStatus.PENDING;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 }
+// Set OrderStatus and PaymentStatus as PENDING by default
