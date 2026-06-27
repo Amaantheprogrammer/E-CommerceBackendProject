@@ -22,7 +22,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     @Transactional(readOnly = true)
     public BankAccountDto getByUserId(Long userId) {
-        BankAccount bankAccount = bankAccountRepository.findByUserId(userId)
+        BankAccount bankAccount = bankAccountRepository.findByUser_Id(userId)
                         .orElseThrow(() -> new ResourceNotFoundException("Account not found with user ID: " + userId));
         return mapToDto(bankAccount);
     }
@@ -33,10 +33,10 @@ public class BankAccountServiceImpl implements BankAccountService {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Deposit amount must be greater than zero.");
         }
-        BankAccount bankAccount = bankAccountRepository.findByUserId(userId)
+        BankAccount bankAccount = bankAccountRepository.findByUser_Id(userId)
                         .orElseThrow(() -> new ResourceNotFoundException("Account not found with user ID: " + userId));
         bankAccount.setBalance(bankAccount.getBalance().add(amount));
-        return mapToDto(bankAccount);
+        return mapToDto(bankAccountRepository.save(bankAccount));
     }
 
     @Override
@@ -45,13 +45,13 @@ public class BankAccountServiceImpl implements BankAccountService {
         if (amount ==  null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Withdraw amount must be greater than 0");
         }
-        BankAccount bankAccount = bankAccountRepository.findByUserId(userId)
+        BankAccount bankAccount = bankAccountRepository.findByUser_Id(userId)
                          .orElseThrow(() -> new ResourceNotFoundException("Account not found with user ID: " + userId));
         if (bankAccount.getBalance().compareTo(amount) < 0) {
             throw new BadRequestException("Insufficient balance in the bank account");
         }
         bankAccount.setBalance(bankAccount.getBalance().subtract(amount));
-        return mapToDto(bankAccount);
+        return mapToDto(bankAccountRepository.save(bankAccount));
     }
 
     // Map to DTO

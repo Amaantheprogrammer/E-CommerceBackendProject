@@ -6,6 +6,7 @@ import com.myProject.E_CommerceBackendProject.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,7 +33,7 @@ public class BankAccount {
     @Column(nullable = false, precision = 12, scale = 2) // At most 12 digits with 2 decimal place 
     private BigDecimal balance;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     @ToString.Exclude
     private User user;

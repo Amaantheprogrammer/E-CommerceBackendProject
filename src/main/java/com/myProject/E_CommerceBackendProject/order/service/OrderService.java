@@ -21,4 +21,6 @@ public interface OrderService {
 
     OrderDto placeOrder(Long userId, OrderRequest orderRequest);
 
+    void cancelOrder(Long orderId);
+
 }

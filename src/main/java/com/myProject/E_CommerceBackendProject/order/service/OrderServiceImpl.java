@@ -91,6 +91,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto placeOrder(Long userId, OrderRequest orderRequest) {
+        // Get all necessary fields
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
         Long productId = orderRequest.getProductId();
@@ -99,12 +100,15 @@ public class OrderServiceImpl implements OrderService {
         Integer quantity = orderRequest.getQuantity();
         PaymentMethod paymentMethod = orderRequest.getPaymentMethod();
         Integer stockQuantity = product.getStockQuantity();
+        // Calculate total amount = price * quantity
         BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        // Check insufficient stock quantity
         if (stockQuantity < quantity) {
             throw new BadRequestException("Insufficient stock for product: " + product.getName());
         }
+        // Deduct balance if payment method = bank transfer
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
-           BankAccount bankAccount = bankAccountRepository.findByUserId(userId)
+           BankAccount bankAccount = bankAccountRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account not found with user ID: " + userId));
             if (totalAmount.compareTo(product.getPrice()) < 0) {
                 throw new BadRequestException("Insufficient balance in the account");
@@ -131,6 +135,32 @@ public class OrderServiceImpl implements OrderService {
         product.setStockQuantity(stockQuantity - quantity);
         productRepository.save(product);
         return mapToDto(orderRepository.save(order));
+    }
+    
+    @Override
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+        User user = order.getUser();
+        if (order.getOrderStatus() == OrderStatus.DELIVERED || order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new BadRequestException("Cannot cancel an order with order status: " + order.getOrderStatus());
+        }
+        // Restore stock
+        order.getOrderItems().forEach(item -> {
+            Product product = item.getProduct();
+            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+            productRepository.save(product);
+        });
+        // Refund money if payment method = bank transfer && payment status = paid
+        if (order.getPaymentStatus() == PaymentStatus.PAID && order.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
+            BankAccount bankAccount = bankAccountRepository.findByUser_Id(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Bank account not found for user ID: " + user.getId()));
+            bankAccount.setBalance(bankAccount.getBalance().add(order.getTotalAmount()));
+            bankAccountRepository.save(bankAccount);
+        }
+        order.setOrderStatus(OrderStatus.CANCELLED);
+        order.setPaymentStatus(PaymentStatus.REFUNDED);
     }
 
     // Map to DTO
