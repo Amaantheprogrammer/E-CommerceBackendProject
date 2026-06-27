@@ -1,58 +1,63 @@
-package com.myProject.E_CommerceBackendProject.config;
+// package com.myProject.E_CommerceBackendProject.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.security.authentication.AuthenticationManager;
+// import org.springframework.security.authentication.AuthenticationProvider;
+// import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+// import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+// import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+// import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+// import org.springframework.security.config.http.SessionCreationPolicy;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.web.SecurityFilterChain;
+// import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import lombok.RequiredArgsConstructor;
+// import com.myProject.E_CommerceBackendProject.security.JwtAuthFilter;
 
-@Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
-public class SecurityConfig {
-    
-    private final UserDetailsService userDetailsService;
+// import lombok.RequiredArgsConstructor;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable()) // Disables CSRF protection for testing via Thunder Client
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/products/**", "/categories/**").permitAll() // Publicly open endpoints
-                .anyRequest().authenticated() // Secured endpoints (like /users and /orders)
-            ) 
-            .httpBasic(Customizer.withDefaults()) // Reads standard HTTP Basic Authorization headers
-            .formLogin(Customizer.withDefaults()); // Keeps default browser login interface supported
+// @Configuration
+// @EnableWebSecurity
+// @RequiredArgsConstructor
+// public class SecurityConfig {
 
-        return http.build();
-    }
-    
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-    
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+//     private final JwtAuthFilter jwtAuthFilter;
+//     private final UserDetailsService userDetailsService;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-}
-// Spring security - 49:27
+//     @Bean
+//     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//         http
+//             .csrf(csrf -> csrf.disable())
+//             .authorizeHttpRequests(auth -> auth
+//                 .requestMatchers("/auth/**").permitAll() // Open login/registration endpoints to everyone
+//                 .requestMatchers("/products/**", "/categories/**").permitAll()
+//                 .anyRequest().authenticated() // Block secured profiles behind token headers
+//             )
+//             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No state stored!
+//             .authenticationProvider(authenticationProvider())
+//             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Inject JWT verification gatekeeper
+
+//         return http.build();
+//     }
+
+//     @Bean
+//     public AuthenticationProvider authenticationProvider() {
+//         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+//         authProvider.setUserDetailsService(userDetailsService);
+//         authProvider.setPasswordEncoder(passwordEncoder());
+//         return authProvider;
+//     }
+
+//     @Bean
+//     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+//         return config.getAuthenticationManager();
+//     }
+
+//     @Bean
+//     public PasswordEncoder passwordEncoder() {
+//         return new BCryptPasswordEncoder();
+//     }
+// }

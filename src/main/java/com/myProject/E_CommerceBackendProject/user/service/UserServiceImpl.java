@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    
     @Override
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream().map(this::mapToDto).toList();
@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteAll();
     }
 
+    // Map to DTO
     private UserDto mapToDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
