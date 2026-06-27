@@ -191,6 +191,8 @@ public class OrderServiceImpl implements OrderService {
                 .totalAmount(totalAmount)
                 .paymentMethod(order.getPaymentMethod())
                 .orderDate(order.getOrderDate())
+                .orderStatus(order.getOrderStatus())
+                .paymentStatus(order.getPaymentStatus())
                 .build();
     }
 }
