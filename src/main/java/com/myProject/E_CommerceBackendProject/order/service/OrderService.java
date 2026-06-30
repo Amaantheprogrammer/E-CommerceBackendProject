@@ -19,7 +19,7 @@ public interface OrderService {
 
     OrderDto updatePaymentStatus(Long orderid, PaymentStatus paymentStatus);
 
-    OrderDto placeOrder(Long userId, OrderRequest orderRequest);
+    OrderDto placeOrder(OrderRequest orderRequest);
 
     void cancelOrder(Long orderId);
 

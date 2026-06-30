@@ -52,7 +52,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/orders") .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.GET, "/orders/*").hasAnyRole("ADMIN", "USER", "SELLER")
                     .requestMatchers(HttpMethod.GET, "/orders/user/*").hasAnyRole("ADMIN", "USER")
-                    .requestMatchers(HttpMethod.POST, "/orders/*/place-order").hasRole("USER")
+                    .requestMatchers(HttpMethod.POST, "/orders/place-order").hasRole("USER")
                     .requestMatchers(HttpMethod.PATCH, "/orders/*/cancel") .hasAnyRole("ADMIN", "USER")
                     .requestMatchers(HttpMethod.PATCH, "/orders/*/order-status").hasAnyRole("ADMIN", "SELLER")
                     .requestMatchers(HttpMethod.PATCH, "/orders/*/payment-status") .hasAnyRole("ADMIN", "SELLER")

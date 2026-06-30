@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,30 +92,33 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDto placeOrder(Long userId, OrderRequest orderRequest) {
-        // Get all necessary fields
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+    public OrderDto placeOrder(OrderRequest orderRequest) {
+        User user = getCurrentUser();
         Long productId = orderRequest.getProductId();
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
+                        "Product not found with ID: " + productId));
         Integer quantity = orderRequest.getQuantity();
         PaymentMethod paymentMethod = orderRequest.getPaymentMethod();
         Integer stockQuantity = product.getStockQuantity();
-        // Check insufficient stock quantity
         if (stockQuantity < quantity) {
-            throw new BadRequestException("Insufficient stock for product: " + product.getName());
+            throw new BadRequestException(
+                    "Insufficient stock for product: "
+                    + product.getName());
         }
-        // Calculate total amount = price * quantity
-        BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
-        // Deduct balance if payment method = bank transfer
+        BigDecimal totalAmount= product.getPrice().multiply(BigDecimal.valueOf(quantity));
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
-           BankAccount bankAccount = bankAccountRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Bank account not found with user ID: " + userId));
-            if (totalAmount.compareTo(product.getPrice()) < 0) {
-                throw new BadRequestException("Insufficient balance in the account");
+            BankAccount bankAccount = bankAccountRepository.findByUser_Id(user.getId())
+                            .orElseThrow(()-> new ResourceNotFoundException("Bank account not found for user"));
+            if (bankAccount.getBalance().compareTo(totalAmount) < 0) {
+                throw new BadRequestException(
+                        "Insufficient balance in the account");
             }
-            bankAccount.setBalance(bankAccount.getBalance().subtract(totalAmount));
+
+            bankAccount.setBalance(
+                    bankAccount.getBalance().subtract(totalAmount));
+
             bankAccountRepository.save(bankAccount);
         }
         Order order = Order.builder()
@@ -122,7 +127,10 @@ public class OrderServiceImpl implements OrderService {
                 .paymentMethod(paymentMethod)
                 .orderDate(LocalDateTime.now())
                 .orderStatus(OrderStatus.PENDING)
-                .paymentStatus(paymentMethod == PaymentMethod.BANK_TRANSFER ? PaymentStatus.PAID : PaymentStatus.PENDING)
+                .paymentStatus(
+                        paymentMethod == PaymentMethod.BANK_TRANSFER
+                                ? PaymentStatus.PAID
+                                : PaymentStatus.PENDING)
                 .build();
         OrderItem orderItem = OrderItem.builder()
                 .order(order)
@@ -130,37 +138,67 @@ public class OrderServiceImpl implements OrderService {
                 .quantity(quantity)
                 .priceAtPurchase(product.getPrice())
                 .build();
+
         order.getOrderItems().add(orderItem);
 
         product.setStockQuantity(stockQuantity - quantity);
+
         productRepository.save(product);
+
         return mapToDto(orderRepository.save(order));
     }
-    
+
     @Override
     @Transactional
     public void cancelOrder(Long orderId) {
+        User currentUser = getCurrentUser();
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-        User user = order.getUser();
-        if (order.getOrderStatus() == OrderStatus.DELIVERED || order.getOrderStatus() == OrderStatus.CANCELLED) {
-            throw new BadRequestException("Cannot cancel an order with order status: " + order.getOrderStatus());
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
+                        "Order not found with ID: " + orderId));
+
+        if (!order.getUser().getId().equals(currentUser.getId())) {
+            throw new BadRequestException(
+                    "You can only cancel your own orders");
         }
-        // Restore stock
+        if (order.getOrderStatus() == OrderStatus.DELIVERED
+                || order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new BadRequestException(
+                    "Cannot cancel an order with order status: "
+                    + order.getOrderStatus());
+        }
         order.getOrderItems().forEach(item -> {
             Product product = item.getProduct();
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
             productRepository.save(product);
         });
-        // Refund money if payment method = bank transfer && payment status = paid
         if (order.getPaymentStatus() == PaymentStatus.PAID && order.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
-            BankAccount bankAccount = bankAccountRepository.findByUser_Id(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Bank account not found for user ID: " + user.getId()));
+            BankAccount bankAccount = bankAccountRepository.findByUser_Id(currentUser.getId())
+                            .orElseThrow(()-> new ResourceNotFoundException("Bank account not found"));
+
             bankAccount.setBalance(bankAccount.getBalance().add(order.getTotalAmount()));
+
             bankAccountRepository.save(bankAccount);
         }
+
         order.setOrderStatus(OrderStatus.CANCELLED);
+
         order.setPaymentStatus(PaymentStatus.REFUNDED);
+
+        orderRepository.save(order);
+    }
+
+    private User getCurrentUser() {
+
+        Authentication authentication
+                = SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
+                        "Authenticated user not found"));
     }
 
     // Map to DTO

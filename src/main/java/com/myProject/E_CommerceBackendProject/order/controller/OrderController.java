@@ -53,9 +53,9 @@ public class OrderController {
         return ResponseEntity.ok(orderService.updatePaymentStatus(orderId, paymentStatus));
     }
 
-    @PostMapping("/{userId}/place-order")
-    public ResponseEntity<OrderDto> placeOrder(@PathVariable Long userId, @RequestBody OrderRequest orderRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(userId, orderRequest));
+    @PostMapping("/place-order")
+    public ResponseEntity<OrderDto> placeOrder(@RequestBody OrderRequest orderRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(orderRequest));
     }
 
     @PatchMapping("/{orderId}/cancel")
