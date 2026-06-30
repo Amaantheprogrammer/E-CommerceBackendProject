@@ -47,6 +47,18 @@ src/main/java/com/myProject/E_CommerceBackendProject/
 │   ├── entity/          
 │   ├── repository/      
 │   └── service/   
+│── order/
+│   ├── controller/     
+│   ├── dto/           
+│   ├── entity/          
+│   ├── repository/      
+│   └── service/
+── payment/
+│   ├── controller/     
+│   ├── dto/           
+│   ├── entity/          
+│   ├── repository/      
+│   └── service/
 ├── user/
 │   ├── controller/      # REST API Controllers (Exposing endpoints)
 │   ├── dto/             # Data Transfer Objects (Request/Response payloads)
