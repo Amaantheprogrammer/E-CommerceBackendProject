@@ -3,6 +3,7 @@ package com.myProject.E_CommerceBackendProject.user.entity;
 import com.myProject.E_CommerceBackendProject.cart.entity.Cart;
 import com.myProject.E_CommerceBackendProject.payment.entity.BankAccount;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,7 +45,7 @@ public class User {
     @Column(nullable = false)
     private Role role;
     
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     private Cart cart;
     

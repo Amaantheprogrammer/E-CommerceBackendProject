@@ -43,22 +43,22 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getByUserId(userId));
     }
 
-    @PatchMapping("/order-status/{orderId}")
-    public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatus orderStatus) {
+    @PatchMapping("/{orderId}/order-status")
+    public ResponseEntity<OrderDto> updateOrderQStatus(@PathVariable Long orderId, @RequestBody OrderStatus orderStatus) {
         return ResponseEntity.ok(orderService.updateOrderStatus(orderId, orderStatus));
     }
 
-    @PatchMapping("/payment-status/{orderId}")
+    @PatchMapping("/{orderId}/payment-status")
     public ResponseEntity<OrderDto> updatePaymentStatus(@PathVariable Long orderId, @RequestBody PaymentStatus paymentStatus) {
         return ResponseEntity.ok(orderService.updatePaymentStatus(orderId, paymentStatus));
     }
 
-    @PostMapping("/place-order/{userId}")
+    @PostMapping("/{userId}/place-order")
     public ResponseEntity<OrderDto> placeOrder(@PathVariable Long userId, @RequestBody OrderRequest orderRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(userId, orderRequest));
     }
 
-    @PatchMapping("/cancel/{orderId}")
+    @PatchMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
         orderService.cancelOrder(orderId);
         return ResponseEntity.noContent().build();

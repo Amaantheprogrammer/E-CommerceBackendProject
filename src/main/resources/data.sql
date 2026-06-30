@@ -158,3 +158,7 @@ SET password = '$2a$10$vMvyX9Y9E.eXU.LCOEksEuQvqyL.23qK9lZOnYc880R8BwFzW7a2y'
 WHERE email = 'amaan@example.com';
 
 COMMIT; 
+
+DELETE FROM users
+WHERE role = "ROLE_ADMIN"
+OR role = "ROLE_USER";

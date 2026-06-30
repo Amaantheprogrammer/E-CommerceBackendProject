@@ -1,6 +1,8 @@
 // For User creation
 package com.myProject.E_CommerceBackendProject.user.dto;
 
+import com.myProject.E_CommerceBackendProject.user.entity.PaymentMethod;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -20,4 +22,7 @@ public class NewUserDto {
     @NotBlank(message = "Password is a required field")
     @Size(min = 6, message = "Password should have at least 6 characters")
     private String password;
+    
+    @NotBlank(message = "Payment method is a required field")
+    private PaymentMethod paymentMethod;
 }
