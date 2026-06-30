@@ -71,3 +71,11 @@ public class Order {
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 }
 // Set OrderStatus and PaymentStatus as PENDING by default
+
+/*
+Use of fetch type lazy:
+If you have an admin dashboard displaying a list of 50 recent orders, 
+a default EAGER fetch setup will trigger 50 extra database queries (the N+1 query problem) 
+to fetch 50 separate user profiles. To avoid this. FetchType.LAZY is used
+. 
+*/

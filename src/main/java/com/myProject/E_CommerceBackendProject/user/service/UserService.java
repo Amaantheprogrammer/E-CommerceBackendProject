@@ -20,4 +20,6 @@ public interface UserService {
     void deleteUserById(Long id);
 
     void deleteAllUsers();
+
+    UserDto getUserByEmail(String email);
 }

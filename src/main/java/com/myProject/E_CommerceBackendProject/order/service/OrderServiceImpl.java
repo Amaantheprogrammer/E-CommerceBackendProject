@@ -100,12 +100,12 @@ public class OrderServiceImpl implements OrderService {
         Integer quantity = orderRequest.getQuantity();
         PaymentMethod paymentMethod = orderRequest.getPaymentMethod();
         Integer stockQuantity = product.getStockQuantity();
-        // Calculate total amount = price * quantity
-        BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         // Check insufficient stock quantity
         if (stockQuantity < quantity) {
             throw new BadRequestException("Insufficient stock for product: " + product.getName());
         }
+        // Calculate total amount = price * quantity
+        BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         // Deduct balance if payment method = bank transfer
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
            BankAccount bankAccount = bankAccountRepository.findByUser_Id(userId)
