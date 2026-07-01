@@ -3,6 +3,7 @@ package com.myProject.E_CommerceBackendProject.product.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -29,12 +31,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public Page<ProductDto> getAllProducts(Pageable pageable) {
+        log.info(">>> Fetching all products from the database");
+        simulateSlowDbCall();
         return productRepository.findAllWithCategory(pageable).map(this::mapToDto);
     }
     
     @Override
     @Transactional(readOnly = true)
     public ProductDto getProductById(Long id) {
+        log.info(">>> Fetching product with ID: " + id);
+        simulateSlowDbCall();
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
         return mapToDto(product);
@@ -43,6 +49,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductDto> getProductByNameContainingIgnoreCase(String name) {
+        log.info(">>> Fetching product with name: " + name);
+        simulateSlowDbCall();
         List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
         return products.stream().map(this::mapToDto).toList();
     }
@@ -50,6 +58,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductDto> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
+        log.info(">>> Fetching product with name: " + name + " and price: " + price);
+        simulateSlowDbCall();
         List<Product> products = productRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price);
         return products.stream().map(this::mapToDto).toList();
     }
@@ -57,6 +67,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductDto> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price) {
+        log.info(">>> Fetching product with id: " + id + " and price: " + price);
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category not found with ID: " + id);
         }
@@ -69,6 +80,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductDto createNewProduct(NewProductDto newProductDto) {
+        log.info("Creating product with name: " + newProductDto.getName());
+        simulateSlowDbCall();
         // Check if category exists by id and store it in an object
         Category category = categoryRepository.findById(newProductDto.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + newProductDto.getCategoryId()));
@@ -117,7 +130,9 @@ public class ProductServiceImpl implements ProductService {
         }
         productRepository.deleteById(id);
     }
-
+    
+    // Private methods
+    // Product dto mapping
     private ProductDto mapToDto(Product product) {
         return ProductDto.builder()
                 .id(product.getId())
@@ -131,5 +146,12 @@ public class ProductServiceImpl implements ProductService {
                 .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
                 .build();
     }
-
+    // Slow db call for real time experience
+    private void simulateSlowDbCall() {
+        try {
+            java.lang.Thread.sleep(500);
+        } catch (InterruptedException e) {
+            java.lang.Thread.currentThread().interrupt();
+        }
+    }
 }
