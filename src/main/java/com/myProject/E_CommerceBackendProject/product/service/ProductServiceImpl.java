@@ -31,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("products")
     public Page<ProductDto> getAllProducts(Pageable pageable) {
         log.info(">>> Fetching all products from the database");
         simulateSlowDbCall();
