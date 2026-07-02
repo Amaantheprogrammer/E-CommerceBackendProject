@@ -3,7 +3,7 @@ package com.myProject.E_CommerceBackendProject.product.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +19,7 @@ import com.myProject.E_CommerceBackendProject.product.entity.Product;
 import com.myProject.E_CommerceBackendProject.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "products", key = "#id")
     public ProductDto getProductById(Long id) {
         log.info(">>> Fetching product with ID: " + id);
         simulateSlowDbCall();
