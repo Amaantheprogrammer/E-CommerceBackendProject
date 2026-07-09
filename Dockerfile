@@ -1,15 +1,20 @@
-# Step 1: Use an official OpenJDK runtime image
-FROM eclipse-temurin:21-jre-alpine
-
-# Step 2: Set the working directory inside the container
+# --- Stage 1: Build the Maven Project inside Render ---
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
-# Step 3: Copy the built JAR file into the container
-# For Maven use: target/*.jar | For Gradle use: build/libs/*-SNAPSHOT.jar
-COPY target/*.jar app.jar
+# Copy configuration files and source code
+COPY pom.xml .
+COPY src ./src
 
-# Step 4: Expose your custom Spring Boot port
+# Compile the application and skip tests to speed up the process
+RUN mvn clean package -DskipTests
+
+# --- Stage 2: Create the final lean runtime container ---
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+
+# Copy the compiled JAR straight from the build stage above
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 5048
-
-# Step 5: Execute the Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
