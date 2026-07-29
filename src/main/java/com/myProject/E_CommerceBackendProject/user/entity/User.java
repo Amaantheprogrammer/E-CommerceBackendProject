@@ -53,6 +53,6 @@ public class User {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user") 
     private BankAccount bankAccount;
 }
