@@ -1,7 +1,9 @@
 package com.myProject.E_CommerceBackendProject.user.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,24 +25,28 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
     
     @Override
     public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream().map(this::mapToDto).toList();
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-        return mapToDto(user);
+        return modelMapper.map(user, UserDto.class);
     }
 
     @Override
     public UserDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-        return mapToDto(user);
+        return modelMapper.map(user, UserDto.class);
     }
 
     @Override
@@ -52,7 +58,8 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(newUserDto.getPassword()))
                 .role(Role.ROLE_USER)
                 .build();
-        return mapToDto(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+        return modelMapper.map(savedUser, UserDto.class);
     }
 
     @Override
@@ -62,7 +69,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
         user.setName(updateUserDto.getName());
         user.setEmail(updateUserDto.getEmail());
-        return mapToDto(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+        return modelMapper.map(savedUser, UserDto.class);
     }
 
     @Override
@@ -76,7 +84,8 @@ public class UserServiceImpl implements UserService {
         if (updateUserDto.getEmail() != null) {
             user.setEmail(updateUserDto.getEmail());
         }
-        return mapToDto(user);
+        User savedUser = userRepository.save(user);
+        return modelMapper.map(savedUser, UserDto.class);
     }
 
     @Override
@@ -95,15 +104,5 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException("Database is empty");
         }
         userRepository.deleteAll();
-    }
-
-    // Map to DTO
-    private UserDto mapToDto(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
     }
 }

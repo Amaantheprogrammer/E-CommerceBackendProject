@@ -2,6 +2,7 @@ package com.myProject.E_CommerceBackendProject.payment.service;
 
 import java.math.BigDecimal;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +19,14 @@ import lombok.RequiredArgsConstructor;
 public class BankAccountServiceImpl implements BankAccountService {
     
     private final BankAccountRepository bankAccountRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional(readOnly = true)
     public BankAccountDto getByUserId(Long userId) {
         BankAccount bankAccount = bankAccountRepository.findByUser_Id(userId)
                         .orElseThrow(() -> new ResourceNotFoundException("Account not found with user ID: " + userId));
-        return mapToDto(bankAccount);
+        return modelMapper.map(bankAccount, BankAccountDto.class);
     }
     
     @Override
@@ -36,7 +38,8 @@ public class BankAccountServiceImpl implements BankAccountService {
         BankAccount bankAccount = bankAccountRepository.findByUser_Id(userId)
                         .orElseThrow(() -> new ResourceNotFoundException("Account not found with user ID: " + userId));
         bankAccount.setBalance(bankAccount.getBalance().add(amount));
-        return mapToDto(bankAccountRepository.save(bankAccount));
+        BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
+        return modelMapper.map(savedBankAccount, BankAccountDto.class);
     }
 
     @Override
@@ -51,16 +54,7 @@ public class BankAccountServiceImpl implements BankAccountService {
             throw new BadRequestException("Insufficient balance in the bank account");
         }
         bankAccount.setBalance(bankAccount.getBalance().subtract(amount));
-        return mapToDto(bankAccountRepository.save(bankAccount));
-    }
-
-    // Map to DTO
-    private BankAccountDto mapToDto(BankAccount bankAccount) {
-        return BankAccountDto.builder()
-                        .id(bankAccount.getId())
-                        .balance(bankAccount.getBalance())
-                        .userId(bankAccount.getUser().getId())
-                        .userName(bankAccount.getUser().getName())
-                        .build();
+        BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
+        return modelMapper.map(savedBankAccount, BankAccountDto.class);
     }
 }

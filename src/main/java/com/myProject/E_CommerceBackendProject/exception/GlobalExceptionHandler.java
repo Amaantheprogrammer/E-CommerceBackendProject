@@ -48,6 +48,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
+    @SuppressWarnings("CallToPrintStackTrace")
     public ResponseEntity<ApiError> handleGenericException(Exception ex) {
 
         ex.printStackTrace();
