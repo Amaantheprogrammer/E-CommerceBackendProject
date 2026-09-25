@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductDto implements Serializable {
+public class ProductResponse implements Serializable {
     private Long id;
     private String name;
     private BigDecimal price;

@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.product.dto.NewProductDto;
-import com.myProject.E_CommerceBackendProject.product.dto.ProductDto;
-import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductDto;
+import com.myProject.E_CommerceBackendProject.product.dto.NewProductRequest;
+import com.myProject.E_CommerceBackendProject.product.dto.ProductResponse;
+import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductRequest;
 import com.myProject.E_CommerceBackendProject.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,17 +34,17 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<Page<ProductDto>> getAllProducts(Pageable pageable) {
+    public ResponseEntity<Page<ProductResponse>> getAllProducts(Pageable pageable) {
         return ResponseEntity.ok(productService.getAllProducts(pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ProductDto>> searchProducts(@RequestParam String name, @RequestParam(required = false) BigDecimal price) {
+    public ResponseEntity<List<ProductResponse>> searchProducts(@RequestParam String name, @RequestParam(required = false) BigDecimal price) {
         /*
         GET /products/search?name=phone              → name search only
         GET /products/search?name=phone&price=500 → name + price filter
@@ -56,23 +56,23 @@ public class ProductController {
     }
     
     @GetMapping("/category/{id}")
-    public ResponseEntity<List<ProductDto>> getProductsByCategoryId(@PathVariable Long id, @RequestParam(required = false) BigDecimal price) {
+    public ResponseEntity<List<ProductResponse>> getProductsByCategoryId(@PathVariable Long id, @RequestParam(required = false) BigDecimal price) {
         return ResponseEntity.ok(productService.getProductsByCategoryIdAndPriceLessThan(id, price));
     }
 
     @PostMapping
-    public ResponseEntity<ProductDto> createNewProduct(@RequestBody NewProductDto newProductDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createNewProduct(newProductDto));
+    public ResponseEntity<ProductResponse> createNewProduct(@RequestBody NewProductRequest newProductRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createNewProduct(newProductRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody UpdateProductDto updateProductDto) {
-        return ResponseEntity.ok(productService.updateProduct(id, updateProductDto));
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody UpdateProductRequest updateProductRequest) {
+        return ResponseEntity.ok(productService.updateProduct(id, updateProductRequest));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProductDto> updatePartialProduct(@PathVariable Long id, @RequestBody UpdateProductDto updateProductDto) {
-        return ResponseEntity.ok(productService.updatePartialProduct(id, updateProductDto));
+    public ResponseEntity<ProductResponse> updatePartialProduct(@PathVariable Long id, @RequestBody UpdateProductRequest updateProductRequest) {
+        return ResponseEntity.ok(productService.updatePartialProduct(id, updateProductRequest));
     }
 
     @DeleteMapping("/{id}")

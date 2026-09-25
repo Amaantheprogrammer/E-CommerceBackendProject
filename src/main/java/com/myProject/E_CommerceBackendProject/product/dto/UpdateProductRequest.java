@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateProductDto {
+public class UpdateProductRequest {
     private String name;
     private BigDecimal price;
     private String description;

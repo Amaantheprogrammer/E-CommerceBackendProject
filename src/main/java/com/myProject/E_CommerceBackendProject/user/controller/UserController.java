@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserDto;
-import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserDto;
-import com.myProject.E_CommerceBackendProject.user.dto.UserDto;
+import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
+import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserRequest;
+import com.myProject.E_CommerceBackendProject.user.dto.UserResponse;
 import com.myProject.E_CommerceBackendProject.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -30,28 +30,28 @@ public class UserController {
     private final UserService userService;
     
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createNewUser(@RequestBody @Valid NewUserDto newUserDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createNewUser(newUserDto));
+    public ResponseEntity<UserResponse> createNewUser(@RequestBody @Valid NewUserRequest newUserRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createNewUser(newUserRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserDto updateUserDto) {
-        return ResponseEntity.ok(userService.updateUser(id, updateUserDto));
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest updateUserRequest) {
+        return ResponseEntity.ok(userService.updateUser(id, updateUserRequest));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> updatePartialUser(@PathVariable Long id, @RequestBody UpdateUserDto updateUserDto) {
-        return ResponseEntity.ok(userService.updatePartialUser(id, updateUserDto));
+    public ResponseEntity<UserResponse> updatePartialUser(@PathVariable Long id, @RequestBody UpdateUserRequest updateUserRequest) {
+        return ResponseEntity.ok(userService.updatePartialUser(id, updateUserRequest));
     }
 
     @DeleteMapping("/{id}")

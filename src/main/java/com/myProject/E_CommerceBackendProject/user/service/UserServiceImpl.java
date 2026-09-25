@@ -9,9 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserDto;
-import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserDto;
-import com.myProject.E_CommerceBackendProject.user.dto.UserDto;
+import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
+import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserRequest;
+import com.myProject.E_CommerceBackendProject.user.dto.UserResponse;
 import com.myProject.E_CommerceBackendProject.user.entity.Role;
 import com.myProject.E_CommerceBackendProject.user.entity.User;
 import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
@@ -28,64 +28,64 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user -> modelMapper.map(user, UserDto.class))
+                .map(user -> modelMapper.map(user, UserResponse.class))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserDto getUserById(Long id) {
+    public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-        return modelMapper.map(user, UserDto.class);
+        return modelMapper.map(user, UserResponse.class);
     }
 
     @Override
-    public UserDto getUserByEmail(String email) {
+    public UserResponse getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-        return modelMapper.map(user, UserDto.class);
+        return modelMapper.map(user, UserResponse.class);
     }
 
     @Override
     @Transactional
-    public UserDto createNewUser(NewUserDto newUserDto) {
+    public UserResponse createNewUser(NewUserRequest newUserRequest) {
         User user = User.builder()
-                .name(newUserDto.getName())
-                .email(newUserDto.getEmail())
-                .password(passwordEncoder.encode(newUserDto.getPassword()))
+                .name(newUserRequest.getName())
+                .email(newUserRequest.getEmail())
+                .password(passwordEncoder.encode(newUserRequest.getPassword()))
                 .role(Role.ROLE_USER)
                 .build();
         User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDto.class);
+        return modelMapper.map(savedUser, UserResponse.class);
     }
 
     @Override
     @Transactional
-    public UserDto updateUser(Long id, UpdateUserDto updateUserDto) {
+    public UserResponse updateUser(Long id, UpdateUserRequest updateUserRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-        user.setName(updateUserDto.getName());
-        user.setEmail(updateUserDto.getEmail());
+        user.setName(updateUserRequest.getName());
+        user.setEmail(updateUserRequest.getEmail());
         User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDto.class);
+        return modelMapper.map(savedUser, UserResponse.class);
     }
 
     @Override
     @Transactional
-    public UserDto updatePartialUser(Long id, UpdateUserDto updateUserDto) {
+    public UserResponse updatePartialUser(Long id, UpdateUserRequest updateUserRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-        if (updateUserDto.getName() != null) {
-            user.setName(updateUserDto.getName());
+        if (updateUserRequest.getName() != null) {
+            user.setName(updateUserRequest.getName());
         }
-        if (updateUserDto.getEmail() != null) {
-            user.setEmail(updateUserDto.getEmail());
+        if (updateUserRequest.getEmail() != null) {
+            user.setEmail(updateUserRequest.getEmail());
         }
         User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDto.class);
+        return modelMapper.map(savedUser, UserResponse.class);
     }
 
     @Override

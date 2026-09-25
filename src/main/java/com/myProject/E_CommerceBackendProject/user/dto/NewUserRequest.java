@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class NewUserDto {
+public class NewUserRequest {
     @NotBlank(message = "Name is a required field")
     private String name;
 

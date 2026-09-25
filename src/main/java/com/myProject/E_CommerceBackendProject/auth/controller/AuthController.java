@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.myProject.E_CommerceBackendProject.auth.dto.AuthResponse;
 import com.myProject.E_CommerceBackendProject.auth.dto.LoginRequest;
 import com.myProject.E_CommerceBackendProject.auth.service.AuthService;
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserDto;
+import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +28,7 @@ public class AuthController {
     
     // Register
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody NewUserDto request) {
+    public ResponseEntity<Void> register(@RequestBody NewUserRequest request) {
         authService.register(request);
         return ResponseEntity.noContent().build();
     }

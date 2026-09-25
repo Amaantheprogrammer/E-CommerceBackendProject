@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.myProject.E_CommerceBackendProject.auth.dto.AuthResponse;
 import com.myProject.E_CommerceBackendProject.auth.dto.LoginRequest;
 import com.myProject.E_CommerceBackendProject.security.jwt.JwtService;
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserDto;
+import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
 import com.myProject.E_CommerceBackendProject.user.entity.Role;
 import com.myProject.E_CommerceBackendProject.user.entity.User;
 import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void register(NewUserDto request) {
+    public void register(NewUserRequest request) {
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())

@@ -6,27 +6,27 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.myProject.E_CommerceBackendProject.product.dto.NewProductDto;
-import com.myProject.E_CommerceBackendProject.product.dto.ProductDto;
-import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductDto;
+import com.myProject.E_CommerceBackendProject.product.dto.NewProductRequest;
+import com.myProject.E_CommerceBackendProject.product.dto.ProductResponse;
+import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductRequest;
 
 public interface ProductService {
 
-    Page<ProductDto> getAllProducts(Pageable pageable);
+    Page<ProductResponse> getAllProducts(Pageable pageable);
     
-    ProductDto getProductById(Long id);
+    ProductResponse getProductById(Long id);
 
-    List<ProductDto> getProductByNameContainingIgnoreCase(String name);
+    List<ProductResponse> getProductByNameContainingIgnoreCase(String name);
 
-    List<ProductDto> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price);
+    List<ProductResponse> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price);
 
-    List<ProductDto> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price);
+    List<ProductResponse> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price);
 
-    ProductDto createNewProduct(NewProductDto newProductDto);
+    ProductResponse createNewProduct(NewProductRequest newProductRequest);
 
-    ProductDto updateProduct(Long id, UpdateProductDto updateProductDto);
+    ProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest);
 
-    ProductDto updatePartialProduct(Long id, UpdateProductDto updateProductDto);
+    ProductResponse updatePartialProduct(Long id, UpdateProductRequest updateProductRequest);
 
     void deleteProductById(Long id);
 

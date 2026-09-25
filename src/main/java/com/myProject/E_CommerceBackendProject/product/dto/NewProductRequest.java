@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NewProductDto {
+public class NewProductRequest {
     
     @NotBlank(message = "Name is a required field")
     private String name;

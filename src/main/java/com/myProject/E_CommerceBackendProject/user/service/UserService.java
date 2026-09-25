@@ -2,24 +2,24 @@ package com.myProject.E_CommerceBackendProject.user.service;
 
 import java.util.List;
 
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserDto;
-import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserDto;
-import com.myProject.E_CommerceBackendProject.user.dto.UserDto;
+import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
+import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserRequest;
+import com.myProject.E_CommerceBackendProject.user.dto.UserResponse;
 
 public interface UserService {
-    List<UserDto> getAllUsers();
+    List<UserResponse> getAllUsers();
     
-    UserDto getUserById(Long id);
+    UserResponse getUserById(Long id);
 
-    UserDto createNewUser(NewUserDto newUserDto);
+    UserResponse createNewUser(NewUserRequest newUserRequest);
 
-    UserDto updateUser(Long id, UpdateUserDto updateUserDto);
+    UserResponse updateUser(Long id, UpdateUserRequest updateUserRequest);
 
-    UserDto updatePartialUser(Long id, UpdateUserDto updateUserDto);
+    UserResponse updatePartialUser(Long id, UpdateUserRequest updateUserRequest);
 
     void deleteUserById(Long id);
 
     void deleteAllUsers();
 
-    UserDto getUserByEmail(String email);
+    UserResponse getUserByEmail(String email);
 }

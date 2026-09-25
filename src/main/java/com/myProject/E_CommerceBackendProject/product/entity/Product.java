@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.myProject.E_CommerceBackendProject.category.entity.Category;
 
+import com.myProject.E_CommerceBackendProject.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -50,7 +51,10 @@ public class Product {
     
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-    
+
+    @Column(nullable = false)
+    private User user;
+
     // Owning side
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false) 
