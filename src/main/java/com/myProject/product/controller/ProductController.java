@@ -3,6 +3,7 @@ package com.myProject.product.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.myProject.product.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.myProject.product.dto.NewProductRequest;
 import com.myProject.product.dto.ProductResponse;
 import com.myProject.product.dto.UpdateProductRequest;
-import com.myProject.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 

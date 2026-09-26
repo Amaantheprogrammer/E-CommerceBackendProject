@@ -9,7 +9,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,14 +34,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductServiceImpl implements ProductService {
+public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     @Cacheable("products")
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
@@ -48,8 +50,8 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAllWithCategory(pageable)
                 .map(product -> modelMapper.map(product, ProductResponse.class));
     }
-    
-    @Override
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
@@ -60,7 +62,6 @@ public class ProductServiceImpl implements ProductService {
         return modelMapper.map(product, ProductResponse.class);
     }
 
-    @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductByNameContainingIgnoreCase(String name) {
         log.info(">>> Fetching product with name: " + name);
@@ -71,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
         log.info(">>> Fetching product with name: " + name + " and price: " + price);
@@ -82,7 +83,6 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price) {
         log.info(">>> Fetching product with id: " + id + " and price: " + price);
@@ -97,45 +97,27 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @PreAuthorize("hasRole('SELLER')")
     @Transactional
     public ProductResponse createNewProduct(NewProductRequest newProductRequest) {
-        User user = getCurrentUser();
-        if (!checkIfSeller(user)) {
-            throw new AuthorizationDeniedException("Authorization access denied");
-        }
         log.info("Creating product with name: " + newProductRequest.getName());
         simulateSlowDbCall();
         // Check if category exists by id and store it in an object
         Category category = categoryRepository.findById(newProductRequest.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + newProductRequest.getCategoryId()));
         // Convert NewProductDto to Product 
-        Product product = Product.builder()
-                .name(newProductRequest.getName())
-                .price(newProductRequest.getPrice())
-                .description(newProductRequest.getDescription())
-                .stockQuantity(newProductRequest.getStockQuantity())
-                .user(user)
-                .category(category)
-                .build();
+        Product product = modelMapper.map(newProductRequest, Product.class);
+        product.setUser(getCurrentUser());
         // Save in database as product and return productDto
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
-    
-    
-    @Override
+
+    @PreAuthorize("hasRole('SELLER')")
     @Transactional
     public ProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest) {
-        User user = getCurrentUser();
-        if (!checkIfSeller(user)) {
-            throw new AuthorizationDeniedException("Authorization access denied");
-        }
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
-        if (!product.getUser().getId().equals(user.getId())) {
-            throw new AuthorizationDeniedException("Cannot edit other products");
-        }
         product.setName(updateProductRequest.getName());
         product.setPrice(updateProductRequest.getPrice());
         product.setDescription(updateProductRequest.getDescription());
@@ -143,19 +125,12 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
-    
-    @Override
+
+    @PreAuthorize("hasRole('SELLER')")
     @Transactional
     public ProductResponse updatePartialProduct(Long id, UpdateProductRequest updateProductRequest) {
-        User user = getCurrentUser();
-        if (!checkIfSeller(user)) {
-            throw new AuthorizationDeniedException("Authorization access denied");
-        }
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
-        if (!product.getUser().getId().equals(user.getId())) {
-            throw new AuthorizationDeniedException("Cannot edit other products");
-        }
         if (updateProductRequest.getName() != null) product.setName(updateProductRequest.getName());
         if (updateProductRequest.getPrice() != null) product.setPrice(updateProductRequest.getPrice());
         if (updateProductRequest.getDescription() != null) product.setDescription(updateProductRequest.getDescription());
@@ -163,23 +138,15 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
-    
-    @Override
+
+    @PreAuthorize("hasRole('SELLER')")
     @Transactional
     public void deleteProductById(Long id) {
-        User user = getCurrentUser();
-        if (!checkIfSeller(user)) {
-            throw new AuthorizationDeniedException("Authorization access denied");
-        }
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
-        if (!product.getUser().getId().equals(user.getId())) {
-            throw new AuthorizationDeniedException("Cannot edit other products");
-        }
         productRepository.deleteById(id);
     }
-    
-    // Private methods
+
     // Slow db call for real time experience
     private void simulateSlowDbCall() {
         try {
@@ -194,8 +161,5 @@ public class ProductServiceImpl implements ProductService {
         String email = authentication.getName();
         return userRepository.findByEmail(email)
                             .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-    }
-    private boolean checkIfSeller(User user) {
-        return user.getRole() == Role.ROLE_SELLER;
     }
 }

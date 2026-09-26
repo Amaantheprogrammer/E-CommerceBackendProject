@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BankAccountDto {
+public class BankAccountResponse {
     private Long id;
     private BigDecimal balance;
     private Long userId;

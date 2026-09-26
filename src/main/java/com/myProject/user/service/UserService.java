@@ -4,15 +4,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.myProject.exception.ResourceNotFoundException;
-import com.myProject.user.dto.NewUserRequest;
 import com.myProject.user.dto.UpdateUserRequest;
 import com.myProject.user.dto.UserResponse;
-import com.myProject.user.entity.Role;
 import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
 
@@ -21,13 +24,14 @@ import lombok.RequiredArgsConstructor;
 
 @Service // Service layer or Business logic
 @RequiredArgsConstructor // Objects with "final" keyword get added to the constructor
-public class UserServiceImpl implements UserService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
-    
-    @Override
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional()
     public List<UserResponse> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
@@ -35,49 +39,26 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
         return modelMapper.map(user, UserResponse.class);
     }
 
-    @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
         return modelMapper.map(user, UserResponse.class);
     }
 
-    @Override
-    @Transactional
-    public UserResponse createNewUser(NewUserRequest newUserRequest) {
-        User user = User.builder()
-                .name(newUserRequest.getName())
-                .email(newUserRequest.getEmail())
-                .password(passwordEncoder.encode(newUserRequest.getPassword()))
-                .role(Role.ROLE_USER)
-                .build();
-        User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserResponse.class);
-    }
-
-    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public UserResponse updateUser(Long id, UpdateUserRequest updateUserRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-        user.setName(updateUserRequest.getName());
-        user.setEmail(updateUserRequest.getEmail());
-        User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserResponse.class);
-    }
-
-    @Override
-    @Transactional
-    public UserResponse updatePartialUser(Long id, UpdateUserRequest updateUserRequest) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        validateAuthority(user);
         if (updateUserRequest.getName() != null) {
             user.setName(updateUserRequest.getName());
         }
@@ -88,21 +69,25 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(savedUser, UserResponse.class);
     }
 
-    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public void deleteUserById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with ID: " + id);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        validateAuthority(user);
         userRepository.deleteById(id);
     }
 
-    @Override
-    @Transactional
-    public void deleteAllUsers() {
-        if (userRepository.count() == 0) {
-            throw new ResourceNotFoundException("Database is empty");
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+    }
+
+    private void validateAuthority(User user) {
+        if (!user.getEmail().equals(getCurrentUser().getEmail())) {
+            throw new AuthorizationDeniedException("Unauthorized action");
         }
-        userRepository.deleteAll();
     }
 }

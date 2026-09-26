@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateBankAccountDto {
+public class UpdateBankAccountRequest {
     private Long userId;
     private BigDecimal amount;
 }

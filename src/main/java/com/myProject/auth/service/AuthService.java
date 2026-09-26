@@ -1,5 +1,6 @@
 package com.myProject.auth.service;
 
+import com.myProject.auth.dto.SignupRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -7,9 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.myProject.auth.dto.AuthResponse;
-import com.myProject.auth.dto.LoginRequest;
+import com.myProject.auth.dto.SignInRequest;
 import com.myProject.security.jwt.JwtService;
-import com.myProject.user.dto.NewUserRequest;
 import com.myProject.user.entity.Role;
 import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
@@ -19,16 +19,14 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
-
+public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
     @Transactional
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse signIn(SignInRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -47,9 +45,8 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(token);
     }
 
-    @Override
     @Transactional
-    public void register(NewUserRequest request) {
+    public void signUp(SignupRequest request) {
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())

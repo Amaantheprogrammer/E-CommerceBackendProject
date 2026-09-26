@@ -3,7 +3,10 @@ package com.myProject.order.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,45 +31,45 @@ import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.ui.ModelMap;
 
 @Service
 @RequiredArgsConstructor
-public class OrderServiceImpl implements OrderService {
+public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final BankAccountRepository bankAccountRepository;
+    private final ModelMapper modelMapper;
 
-    @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
-        List<OrderResponse> orderResponses = orders.stream()
-                .map(this::mapToDto)
-                .toList();
-        return orderResponses;
+        return orders.stream()
+                .map(order -> modelMapper.map(order, OrderResponse.class))
+                .collect(Collectors.toList());
     }
 
-    @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public OrderResponse getByOrderId(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-        return mapToDto(order);
+        return modelMapper.map(order, OrderResponse.class);
     }
 
-    @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public List<OrderResponse> getByUserId(Long userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
-        List<OrderResponse> orderResponses = orders.stream()
-                .map(this::mapToDto)
-                .toList();
-        return orderResponses;
+        return orders.stream()
+                .map(order -> modelMapper.map(order, OrderResponse.class))
+                .collect(Collectors.toList());
     }
 
-    @Override
+    @PreAuthorize("hasRole('SELLER')")
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus orderStatus) {
         Order order = orderRepository.findById(orderId)
@@ -75,10 +78,10 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("Cannot ship an order with failed payment status");
         }
         order.setOrderStatus(orderStatus);
-        return mapToDto(orderRepository.save(order));
+        return modelMapper.map(order, OrderResponse.class);
     }
 
-    @Override
+    @PreAuthorize("hasRole('SELLER')")
     @Transactional
     public OrderResponse updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
         Order order = orderRepository.findById(orderId)
@@ -87,10 +90,10 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderStatus(OrderStatus.PLACED);
         }
         order.setPaymentStatus(paymentStatus);
-        return mapToDto(orderRepository.save(order));
+        return modelMapper.map(order, OrderResponse.class);
     }
 
-    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public OrderResponse placeOrder(OrderRequest orderRequest) {
         User user = getCurrentUser();
@@ -107,7 +110,7 @@ public class OrderServiceImpl implements OrderService {
                     "Insufficient stock for product: "
                     + product.getName());
         }
-        BigDecimal totalAmount= product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
             BankAccount bankAccount = bankAccountRepository.findByUser_Id(user.getId())
                             .orElseThrow(()-> new ResourceNotFoundException("Bank account not found for user"));
@@ -116,8 +119,7 @@ public class OrderServiceImpl implements OrderService {
                         "Insufficient balance in the account");
             }
 
-            bankAccount.setBalance(
-                    bankAccount.getBalance().subtract(totalAmount));
+            bankAccount.setBalance(bankAccount.getBalance().subtract(totalAmount));
 
             bankAccountRepository.save(bankAccount);
         }
@@ -145,10 +147,10 @@ public class OrderServiceImpl implements OrderService {
 
         productRepository.save(product);
 
-        return mapToDto(orderRepository.save(order));
+        return modelMapper.map(order, OrderResponse.class);
     }
 
-    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public void cancelOrder(Long orderId) {
         User currentUser = getCurrentUser();
@@ -199,38 +201,5 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
                         "Authenticated user not found"));
-    }
-
-    // Map to DTO
-    private OrderItemResponse orderItemDtoConversion(OrderItem orderItem) {
-        return OrderItemResponse.builder()
-                .id(orderItem.getId())
-                .orderId(orderItem.getOrder().getId())
-                .productId(orderItem.getProduct().getId())
-                .quantity(orderItem.getQuantity())
-                .priceAtPurchase(orderItem.getPriceAtPurchase())
-                .build();
-    }
-
-    private OrderResponse mapToDto(Order order) {
-        List<OrderItemResponse> orderItemResponses = order.getOrderItems()
-                .stream()
-                .map(this::orderItemDtoConversion)
-                .toList();
-        BigDecimal totalAmount = order.getOrderItems()
-                .stream()
-                .map(item -> item.getPriceAtPurchase().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return OrderResponse.builder()
-                .id(order.getId())
-                .userId(order.getUser().getId())
-                .userName(order.getUser().getName())
-                .orderItems(orderItemResponses)
-                .totalAmount(totalAmount)
-                .paymentMethod(order.getPaymentMethod())
-                .orderDate(order.getOrderDate())
-                .orderStatus(order.getOrderStatus())
-                .paymentStatus(order.getPaymentStatus())
-                .build();
     }
 }
