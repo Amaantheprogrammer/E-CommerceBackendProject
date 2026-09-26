@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.order.entity;
+package com.myProject.order.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.myProject.E_CommerceBackendProject.user.entity.User;
+import com.myProject.user.entity.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

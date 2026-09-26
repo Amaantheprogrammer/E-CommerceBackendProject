@@ -1,11 +1,11 @@
-package com.myProject.E_CommerceBackendProject.user.repository;
+package com.myProject.user.repository;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.myProject.E_CommerceBackendProject.user.entity.User;
+import com.myProject.user.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     // Create own method besides the in-built ones(findAll, findById, deleteAll, etc)

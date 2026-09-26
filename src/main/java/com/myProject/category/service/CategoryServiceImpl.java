@@ -1,15 +1,15 @@
-package com.myProject.E_CommerceBackendProject.category.service;
+package com.myProject.category.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.myProject.E_CommerceBackendProject.category.dto.CategoryDto;
-import com.myProject.E_CommerceBackendProject.category.dto.NewCategoryDto;
-import com.myProject.E_CommerceBackendProject.category.entity.Category;
-import com.myProject.E_CommerceBackendProject.category.repository.CategoryRepository;
-import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
+import com.myProject.category.dto.CategoryDto;
+import com.myProject.category.dto.NewCategoryDto;
+import com.myProject.category.entity.Category;
+import com.myProject.category.repository.CategoryRepository;
+import com.myProject.exception.ResourceNotFoundException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.config;
+package com.myProject.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.myProject.E_CommerceBackendProject.security.jwt.JwtAuthFilter;
+import com.myProject.security.jwt.JwtAuthFilter;
 
 import lombok.RequiredArgsConstructor;
 

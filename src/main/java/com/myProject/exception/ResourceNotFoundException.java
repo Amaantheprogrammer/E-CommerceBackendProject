@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.exception;
+package com.myProject.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

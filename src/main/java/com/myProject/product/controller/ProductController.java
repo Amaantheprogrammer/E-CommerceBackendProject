@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.product.controller;
+package com.myProject.product.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.product.dto.NewProductRequest;
-import com.myProject.E_CommerceBackendProject.product.dto.ProductResponse;
-import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductRequest;
-import com.myProject.E_CommerceBackendProject.product.service.ProductService;
+import com.myProject.product.dto.NewProductRequest;
+import com.myProject.product.dto.ProductResponse;
+import com.myProject.product.dto.UpdateProductRequest;
+import com.myProject.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 

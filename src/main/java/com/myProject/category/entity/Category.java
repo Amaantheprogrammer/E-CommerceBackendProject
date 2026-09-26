@@ -1,9 +1,9 @@
-package com.myProject.E_CommerceBackendProject.category.entity;
+package com.myProject.category.entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.myProject.E_CommerceBackendProject.product.entity.Product;
+import com.myProject.product.entity.Product;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

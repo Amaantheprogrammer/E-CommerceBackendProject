@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.order.entity;
+package com.myProject.order.entity;
 
 public enum OrderStatus {
     PENDING,

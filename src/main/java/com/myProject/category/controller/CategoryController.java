@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.category.controller;
+package com.myProject.category.controller;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.category.dto.CategoryDto;
-import com.myProject.E_CommerceBackendProject.category.dto.NewCategoryDto;
-import com.myProject.E_CommerceBackendProject.category.service.CategoryService;
+import com.myProject.category.dto.CategoryDto;
+import com.myProject.category.dto.NewCategoryDto;
+import com.myProject.category.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
 

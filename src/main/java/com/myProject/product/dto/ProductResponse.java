@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.product.dto;
+package com.myProject.product.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

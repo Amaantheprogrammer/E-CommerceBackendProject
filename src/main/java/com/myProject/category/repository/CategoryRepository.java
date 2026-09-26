@@ -1,9 +1,9 @@
-package com.myProject.E_CommerceBackendProject.category.repository;
+package com.myProject.category.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.myProject.E_CommerceBackendProject.category.entity.Category;
+import com.myProject.category.entity.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 

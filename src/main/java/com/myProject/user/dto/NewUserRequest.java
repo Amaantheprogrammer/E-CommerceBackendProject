@@ -1,7 +1,7 @@
 // For User creation
-package com.myProject.E_CommerceBackendProject.user.dto;
+package com.myProject.user.dto;
 
-import com.myProject.E_CommerceBackendProject.user.entity.PaymentMethod;
+import com.myProject.user.entity.PaymentMethod;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

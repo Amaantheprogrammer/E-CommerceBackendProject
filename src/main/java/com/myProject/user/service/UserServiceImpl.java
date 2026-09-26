@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.user.service;
+package com.myProject.user.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,13 +8,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
-import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserRequest;
-import com.myProject.E_CommerceBackendProject.user.dto.UserResponse;
-import com.myProject.E_CommerceBackendProject.user.entity.Role;
-import com.myProject.E_CommerceBackendProject.user.entity.User;
-import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
+import com.myProject.exception.ResourceNotFoundException;
+import com.myProject.user.dto.NewUserRequest;
+import com.myProject.user.dto.UpdateUserRequest;
+import com.myProject.user.dto.UserResponse;
+import com.myProject.user.entity.Role;
+import com.myProject.user.entity.User;
+import com.myProject.user.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

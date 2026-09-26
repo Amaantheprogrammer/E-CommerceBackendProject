@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.security.jwt;
+package com.myProject.security.jwt;
 
 import java.security.Key;
 import java.util.Date;

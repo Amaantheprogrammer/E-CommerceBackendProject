@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.order.service;
+package com.myProject.order.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,23 +9,23 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.myProject.E_CommerceBackendProject.exception.BadRequestException;
-import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
-import com.myProject.E_CommerceBackendProject.order.dto.OrderResponse;
-import com.myProject.E_CommerceBackendProject.order.dto.OrderItemResponse;
-import com.myProject.E_CommerceBackendProject.order.dto.OrderRequest;
-import com.myProject.E_CommerceBackendProject.order.entity.Order;
-import com.myProject.E_CommerceBackendProject.order.entity.OrderItem;
-import com.myProject.E_CommerceBackendProject.order.entity.OrderStatus;
-import com.myProject.E_CommerceBackendProject.order.entity.PaymentMethod;
-import com.myProject.E_CommerceBackendProject.order.entity.PaymentStatus;
-import com.myProject.E_CommerceBackendProject.order.repository.OrderRepository;
-import com.myProject.E_CommerceBackendProject.payment.entity.BankAccount;
-import com.myProject.E_CommerceBackendProject.payment.repository.BankAccountRepository;
-import com.myProject.E_CommerceBackendProject.product.entity.Product;
-import com.myProject.E_CommerceBackendProject.product.repository.ProductRepository;
-import com.myProject.E_CommerceBackendProject.user.entity.User;
-import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
+import com.myProject.exception.BadRequestException;
+import com.myProject.exception.ResourceNotFoundException;
+import com.myProject.order.dto.OrderResponse;
+import com.myProject.order.dto.OrderItemResponse;
+import com.myProject.order.dto.OrderRequest;
+import com.myProject.order.entity.Order;
+import com.myProject.order.entity.OrderItem;
+import com.myProject.order.entity.OrderStatus;
+import com.myProject.order.entity.PaymentMethod;
+import com.myProject.order.entity.PaymentStatus;
+import com.myProject.order.repository.OrderRepository;
+import com.myProject.payment.entity.BankAccount;
+import com.myProject.payment.repository.BankAccountRepository;
+import com.myProject.product.entity.Product;
+import com.myProject.product.repository.ProductRepository;
+import com.myProject.user.entity.User;
+import com.myProject.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

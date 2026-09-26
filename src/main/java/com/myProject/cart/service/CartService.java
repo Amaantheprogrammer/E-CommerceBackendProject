@@ -1,6 +1,6 @@
-package com.myProject.E_CommerceBackendProject.cart.service;
+package com.myProject.cart.service;
 
-import com.myProject.E_CommerceBackendProject.cart.dto.CartDto;
+import com.myProject.cart.dto.CartDto;
 
 public interface CartService {
 

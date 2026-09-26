@@ -1,11 +1,11 @@
-package com.myProject.E_CommerceBackendProject.order.service;
+package com.myProject.order.service;
 
 import java.util.List;
 
-import com.myProject.E_CommerceBackendProject.order.dto.OrderResponse;
-import com.myProject.E_CommerceBackendProject.order.dto.OrderRequest;
-import com.myProject.E_CommerceBackendProject.order.entity.OrderStatus;
-import com.myProject.E_CommerceBackendProject.order.entity.PaymentStatus;
+import com.myProject.order.dto.OrderResponse;
+import com.myProject.order.dto.OrderRequest;
+import com.myProject.order.entity.OrderStatus;
+import com.myProject.order.entity.PaymentStatus;
 
 public interface OrderService {
 

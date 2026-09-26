@@ -1,6 +1,6 @@
-package com.myProject.E_CommerceBackendProject.cart.entity;
+package com.myProject.cart.entity;
 
-import com.myProject.E_CommerceBackendProject.product.entity.Product;
+import com.myProject.product.entity.Product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

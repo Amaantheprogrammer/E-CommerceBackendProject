@@ -1,6 +1,6 @@
-package com.myProject.E_CommerceBackendProject.order.dto;
+package com.myProject.order.dto;
 
-import com.myProject.E_CommerceBackendProject.order.entity.PaymentMethod;
+import com.myProject.order.entity.PaymentMethod;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

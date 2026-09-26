@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.user.controller;
+package com.myProject.user.controller;
 
 import java.util.List;
 
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
-import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserRequest;
-import com.myProject.E_CommerceBackendProject.user.dto.UserResponse;
-import com.myProject.E_CommerceBackendProject.user.service.UserService;
+import com.myProject.user.dto.NewUserRequest;
+import com.myProject.user.dto.UpdateUserRequest;
+import com.myProject.user.dto.UserResponse;
+import com.myProject.user.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

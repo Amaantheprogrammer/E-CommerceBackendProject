@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.cart.dto;
+package com.myProject.cart.dto;
 
 import java.math.BigDecimal;
 

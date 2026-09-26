@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.user.entity;
+package com.myProject.user.entity;
 
 public enum PaymentMethod {
     CASH_ON_DELIVERY,

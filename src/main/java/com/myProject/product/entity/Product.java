@@ -1,10 +1,10 @@
-package com.myProject.E_CommerceBackendProject.product.entity;
+package com.myProject.product.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.myProject.E_CommerceBackendProject.category.entity.Category;
-import com.myProject.E_CommerceBackendProject.user.entity.User;
+import com.myProject.category.entity.Category;
+import com.myProject.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

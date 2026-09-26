@@ -1,10 +1,10 @@
-package com.myProject.E_CommerceBackendProject.product.service;
+package com.myProject.product.service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.myProject.E_CommerceBackendProject.user.entity.Role;
+import com.myProject.user.entity.Role;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -15,16 +15,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.myProject.E_CommerceBackendProject.category.entity.Category;
-import com.myProject.E_CommerceBackendProject.category.repository.CategoryRepository;
-import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
-import com.myProject.E_CommerceBackendProject.product.dto.NewProductRequest;
-import com.myProject.E_CommerceBackendProject.product.dto.ProductResponse;
-import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductRequest;
-import com.myProject.E_CommerceBackendProject.product.entity.Product;
-import com.myProject.E_CommerceBackendProject.product.repository.ProductRepository;
-import com.myProject.E_CommerceBackendProject.user.entity.User;
-import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
+import com.myProject.category.entity.Category;
+import com.myProject.category.repository.CategoryRepository;
+import com.myProject.exception.ResourceNotFoundException;
+import com.myProject.product.dto.NewProductRequest;
+import com.myProject.product.dto.ProductResponse;
+import com.myProject.product.dto.UpdateProductRequest;
+import com.myProject.product.entity.Product;
+import com.myProject.product.repository.ProductRepository;
+import com.myProject.user.entity.User;
+import com.myProject.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

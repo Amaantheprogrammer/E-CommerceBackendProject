@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.payment.controller;
+package com.myProject.payment.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.payment.dto.BankAccountDto;
-import com.myProject.E_CommerceBackendProject.payment.dto.UpdateBankAccountDto;
-import com.myProject.E_CommerceBackendProject.payment.service.BankAccountService;
+import com.myProject.payment.dto.BankAccountDto;
+import com.myProject.payment.dto.UpdateBankAccountDto;
+import com.myProject.payment.service.BankAccountService;
 
 import lombok.RequiredArgsConstructor;
 

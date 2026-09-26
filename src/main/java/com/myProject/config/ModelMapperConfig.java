@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.config;
+package com.myProject.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

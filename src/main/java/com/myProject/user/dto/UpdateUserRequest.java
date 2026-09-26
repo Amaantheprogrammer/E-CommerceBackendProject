@@ -1,5 +1,5 @@
 // For user updation
-package com.myProject.E_CommerceBackendProject.user.dto;
+package com.myProject.user.dto;
 
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;

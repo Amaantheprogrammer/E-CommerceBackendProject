@@ -1,6 +1,6 @@
-package com.myProject.E_CommerceBackendProject.user.dto;
+package com.myProject.user.dto;
 
-import com.myProject.E_CommerceBackendProject.user.entity.Role;
+import com.myProject.user.entity.Role;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

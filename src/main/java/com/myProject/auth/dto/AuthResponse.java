@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.auth.dto;
+package com.myProject.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

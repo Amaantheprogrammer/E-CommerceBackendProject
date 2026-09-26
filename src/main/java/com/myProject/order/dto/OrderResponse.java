@@ -1,12 +1,12 @@
-package com.myProject.E_CommerceBackendProject.order.dto;
+package com.myProject.order.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.myProject.E_CommerceBackendProject.order.entity.OrderStatus;
-import com.myProject.E_CommerceBackendProject.order.entity.PaymentMethod;
-import com.myProject.E_CommerceBackendProject.order.entity.PaymentStatus;
+import com.myProject.order.entity.OrderStatus;
+import com.myProject.order.entity.PaymentMethod;
+import com.myProject.order.entity.PaymentStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

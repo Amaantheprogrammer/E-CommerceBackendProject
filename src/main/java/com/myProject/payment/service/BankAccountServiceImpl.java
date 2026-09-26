@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.payment.service;
+package com.myProject.payment.service;
 
 import java.math.BigDecimal;
 
@@ -6,11 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.myProject.E_CommerceBackendProject.exception.BadRequestException;
-import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
-import com.myProject.E_CommerceBackendProject.payment.dto.BankAccountDto;
-import com.myProject.E_CommerceBackendProject.payment.entity.BankAccount;
-import com.myProject.E_CommerceBackendProject.payment.repository.BankAccountRepository;
+import com.myProject.exception.BadRequestException;
+import com.myProject.exception.ResourceNotFoundException;
+import com.myProject.payment.dto.BankAccountDto;
+import com.myProject.payment.entity.BankAccount;
+import com.myProject.payment.repository.BankAccountRepository;
 
 import lombok.RequiredArgsConstructor;
 

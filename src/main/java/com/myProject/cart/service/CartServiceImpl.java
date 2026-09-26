@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.cart.service;
+package com.myProject.cart.service;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -7,17 +7,17 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.myProject.E_CommerceBackendProject.cart.dto.CartDto;
-import com.myProject.E_CommerceBackendProject.cart.dto.CartItemDto;
-import com.myProject.E_CommerceBackendProject.cart.entity.Cart;
-import com.myProject.E_CommerceBackendProject.cart.entity.CartItem;
-import com.myProject.E_CommerceBackendProject.cart.repository.CartRepository;
-import com.myProject.E_CommerceBackendProject.exception.BadRequestException;
-import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
-import com.myProject.E_CommerceBackendProject.product.entity.Product;
-import com.myProject.E_CommerceBackendProject.product.repository.ProductRepository;
-import com.myProject.E_CommerceBackendProject.user.entity.User;
-import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
+import com.myProject.cart.dto.CartDto;
+import com.myProject.cart.dto.CartItemDto;
+import com.myProject.cart.entity.Cart;
+import com.myProject.cart.entity.CartItem;
+import com.myProject.cart.repository.CartRepository;
+import com.myProject.exception.BadRequestException;
+import com.myProject.exception.ResourceNotFoundException;
+import com.myProject.product.entity.Product;
+import com.myProject.product.repository.ProductRepository;
+import com.myProject.user.entity.User;
+import com.myProject.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

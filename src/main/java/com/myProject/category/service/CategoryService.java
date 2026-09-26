@@ -1,9 +1,9 @@
-package com.myProject.E_CommerceBackendProject.category.service;
+package com.myProject.category.service;
 
 import java.util.List;
 
-import com.myProject.E_CommerceBackendProject.category.dto.CategoryDto;
-import com.myProject.E_CommerceBackendProject.category.dto.NewCategoryDto;
+import com.myProject.category.dto.CategoryDto;
+import com.myProject.category.dto.NewCategoryDto;
 
 public interface CategoryService {
 

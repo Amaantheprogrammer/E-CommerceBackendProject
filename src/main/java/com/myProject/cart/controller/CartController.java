@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.cart.controller;
+package com.myProject.cart.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.cart.dto.CartDto;
-import com.myProject.E_CommerceBackendProject.cart.dto.UpdateCartDto;
-import com.myProject.E_CommerceBackendProject.cart.service.CartService;
+import com.myProject.cart.dto.CartDto;
+import com.myProject.cart.dto.UpdateCartDto;
+import com.myProject.cart.service.CartService;
 
 import lombok.RequiredArgsConstructor;
 

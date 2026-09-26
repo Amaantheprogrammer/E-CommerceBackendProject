@@ -1,10 +1,10 @@
-package com.myProject.E_CommerceBackendProject.user.service;
+package com.myProject.user.service;
 
 import java.util.List;
 
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
-import com.myProject.E_CommerceBackendProject.user.dto.UpdateUserRequest;
-import com.myProject.E_CommerceBackendProject.user.dto.UserResponse;
+import com.myProject.user.dto.NewUserRequest;
+import com.myProject.user.dto.UpdateUserRequest;
+import com.myProject.user.dto.UserResponse;
 
 public interface UserService {
     List<UserResponse> getAllUsers();

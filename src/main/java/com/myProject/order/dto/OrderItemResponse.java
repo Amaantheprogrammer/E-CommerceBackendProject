@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.order.dto;
+package com.myProject.order.dto;
 
 import java.math.BigDecimal;
 

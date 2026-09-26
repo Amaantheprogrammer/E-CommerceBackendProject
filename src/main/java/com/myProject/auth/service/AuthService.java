@@ -1,8 +1,8 @@
-package com.myProject.E_CommerceBackendProject.auth.service;
+package com.myProject.auth.service;
 
-import com.myProject.E_CommerceBackendProject.auth.dto.AuthResponse;
-import com.myProject.E_CommerceBackendProject.auth.dto.LoginRequest;
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
+import com.myProject.auth.dto.AuthResponse;
+import com.myProject.auth.dto.LoginRequest;
+import com.myProject.user.dto.NewUserRequest;
 
 public interface AuthService {
     

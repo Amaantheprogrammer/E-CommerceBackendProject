@@ -1,8 +1,8 @@
-package com.myProject.E_CommerceBackendProject.payment.service;
+package com.myProject.payment.service;
 
 import java.math.BigDecimal;
 
-import com.myProject.E_CommerceBackendProject.payment.dto.BankAccountDto;
+import com.myProject.payment.dto.BankAccountDto;
 
 public interface BankAccountService {
 

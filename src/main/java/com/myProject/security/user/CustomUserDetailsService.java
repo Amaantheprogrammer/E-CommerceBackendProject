@@ -1,12 +1,12 @@
-package com.myProject.E_CommerceBackendProject.security.user;
+package com.myProject.security.user;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.myProject.E_CommerceBackendProject.user.entity.User;
-import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
+import com.myProject.user.entity.User;
+import com.myProject.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

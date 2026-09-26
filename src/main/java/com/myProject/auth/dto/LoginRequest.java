@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.auth.dto;
+package com.myProject.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

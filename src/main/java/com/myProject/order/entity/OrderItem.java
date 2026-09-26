@@ -1,8 +1,8 @@
-package com.myProject.E_CommerceBackendProject.order.entity;
+package com.myProject.order.entity;
 
 import java.math.BigDecimal;
 
-import com.myProject.E_CommerceBackendProject.product.entity.Product;
+import com.myProject.product.entity.Product;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Column;

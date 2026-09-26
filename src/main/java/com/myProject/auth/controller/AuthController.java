@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.auth.controller;
+package com.myProject.auth.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.auth.dto.AuthResponse;
-import com.myProject.E_CommerceBackendProject.auth.dto.LoginRequest;
-import com.myProject.E_CommerceBackendProject.auth.service.AuthService;
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
+import com.myProject.auth.dto.AuthResponse;
+import com.myProject.auth.dto.LoginRequest;
+import com.myProject.auth.service.AuthService;
+import com.myProject.user.dto.NewUserRequest;
 
 import lombok.RequiredArgsConstructor;
 

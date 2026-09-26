@@ -1,8 +1,8 @@
-package com.myProject.E_CommerceBackendProject.payment.entity;
+package com.myProject.payment.entity;
 
 import java.math.BigDecimal;
 
-import com.myProject.E_CommerceBackendProject.user.entity.User;
+import com.myProject.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

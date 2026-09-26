@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.auth.service;
+package com.myProject.auth.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -6,13 +6,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.myProject.E_CommerceBackendProject.auth.dto.AuthResponse;
-import com.myProject.E_CommerceBackendProject.auth.dto.LoginRequest;
-import com.myProject.E_CommerceBackendProject.security.jwt.JwtService;
-import com.myProject.E_CommerceBackendProject.user.dto.NewUserRequest;
-import com.myProject.E_CommerceBackendProject.user.entity.Role;
-import com.myProject.E_CommerceBackendProject.user.entity.User;
-import com.myProject.E_CommerceBackendProject.user.repository.UserRepository;
+import com.myProject.auth.dto.AuthResponse;
+import com.myProject.auth.dto.LoginRequest;
+import com.myProject.security.jwt.JwtService;
+import com.myProject.user.dto.NewUserRequest;
+import com.myProject.user.entity.Role;
+import com.myProject.user.entity.User;
+import com.myProject.user.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

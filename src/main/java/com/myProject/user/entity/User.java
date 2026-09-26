@@ -1,8 +1,8 @@
-package com.myProject.E_CommerceBackendProject.user.entity;
+package com.myProject.user.entity;
 
-import com.myProject.E_CommerceBackendProject.cart.entity.Cart;
-import com.myProject.E_CommerceBackendProject.payment.entity.BankAccount;
-import com.myProject.E_CommerceBackendProject.product.entity.Product;
+import com.myProject.cart.entity.Cart;
+import com.myProject.payment.entity.BankAccount;
+import com.myProject.product.entity.Product;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

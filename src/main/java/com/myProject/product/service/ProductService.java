@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.product.service;
+package com.myProject.product.service;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.myProject.E_CommerceBackendProject.product.dto.NewProductRequest;
-import com.myProject.E_CommerceBackendProject.product.dto.ProductResponse;
-import com.myProject.E_CommerceBackendProject.product.dto.UpdateProductRequest;
+import com.myProject.product.dto.NewProductRequest;
+import com.myProject.product.dto.ProductResponse;
+import com.myProject.product.dto.UpdateProductRequest;
 
 public interface ProductService {
 

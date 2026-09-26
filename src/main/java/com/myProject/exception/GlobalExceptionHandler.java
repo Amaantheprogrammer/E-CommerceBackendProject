@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.exception;
+package com.myProject.exception;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;

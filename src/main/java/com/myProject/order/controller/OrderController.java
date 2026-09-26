@@ -1,4 +1,4 @@
-package com.myProject.E_CommerceBackendProject.order.controller;
+package com.myProject.order.controller;
 
 import java.util.List;
 
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.E_CommerceBackendProject.order.dto.OrderResponse;
-import com.myProject.E_CommerceBackendProject.order.dto.OrderRequest;
-import com.myProject.E_CommerceBackendProject.order.entity.OrderStatus;
-import com.myProject.E_CommerceBackendProject.order.entity.PaymentStatus;
-import com.myProject.E_CommerceBackendProject.order.service.OrderService;
+import com.myProject.order.dto.OrderResponse;
+import com.myProject.order.dto.OrderRequest;
+import com.myProject.order.entity.OrderStatus;
+import com.myProject.order.entity.PaymentStatus;
+import com.myProject.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
 
