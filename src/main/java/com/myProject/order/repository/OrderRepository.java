@@ -10,7 +10,13 @@ import com.myProject.E_CommerceBackendProject.order.entity.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("SELECT o FROM Order o JOIN FETCH o.user JOIN FETCH o.orderItems WHERE o.user.id = :userId")
+    @Query("""
+            SELECT o 
+            FROM Order o 
+            JOIN FETCH o.user 
+            JOIN FETCH o.orderItems 
+            WHERE o.user.id = :userId
+           """)
     List<Order> findByUserId(@Param("userId") Long userId);
 
 }

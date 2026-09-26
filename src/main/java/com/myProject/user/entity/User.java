@@ -2,6 +2,7 @@ package com.myProject.E_CommerceBackendProject.user.entity;
 
 import com.myProject.E_CommerceBackendProject.cart.entity.Cart;
 import com.myProject.E_CommerceBackendProject.payment.entity.BankAccount;
+import com.myProject.E_CommerceBackendProject.product.entity.Product;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,16 +13,18 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter 
 @Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,7 +40,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @ToString.Exclude
     @Column(nullable = false)
     private String password;
     
@@ -46,7 +48,7 @@ public class User {
     private Role role;
     
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @ToString.Exclude
+
     private Cart cart;
     
     @Enumerated(EnumType.STRING)
@@ -55,4 +57,7 @@ public class User {
 
     @OneToOne(mappedBy = "user") 
     private BankAccount bankAccount;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Product product;
 }

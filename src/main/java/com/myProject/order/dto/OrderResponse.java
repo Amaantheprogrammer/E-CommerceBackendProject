@@ -17,11 +17,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderDto {  
+public class OrderResponse {
     private Long id;
     private Long userId;
     private String userName;
-    private List<OrderItemDto> orderItems;
+    private List<OrderItemResponse> orderItems;
     private BigDecimal totalAmount;
     private PaymentMethod paymentMethod;
     private LocalDateTime orderDate;

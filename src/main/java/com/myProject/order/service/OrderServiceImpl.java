@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.myProject.E_CommerceBackendProject.exception.BadRequestException;
 import com.myProject.E_CommerceBackendProject.exception.ResourceNotFoundException;
-import com.myProject.E_CommerceBackendProject.order.dto.OrderDto;
-import com.myProject.E_CommerceBackendProject.order.dto.OrderItemDto;
+import com.myProject.E_CommerceBackendProject.order.dto.OrderResponse;
+import com.myProject.E_CommerceBackendProject.order.dto.OrderItemResponse;
 import com.myProject.E_CommerceBackendProject.order.dto.OrderRequest;
 import com.myProject.E_CommerceBackendProject.order.entity.Order;
 import com.myProject.E_CommerceBackendProject.order.entity.OrderItem;
@@ -40,17 +40,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDto> getAllOrders() {
+    public List<OrderResponse> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
-        List<OrderDto> orderDtos = orders.stream()
+        List<OrderResponse> orderResponses = orders.stream()
                 .map(this::mapToDto)
                 .toList();
-        return orderDtos;
+        return orderResponses;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public OrderDto getByOrderId(Long orderId) {
+    public OrderResponse getByOrderId(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         return mapToDto(order);
@@ -58,17 +58,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDto> getByUserId(Long userId) {
+    public List<OrderResponse> getByUserId(Long userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
-        List<OrderDto> orderDtos = orders.stream()
+        List<OrderResponse> orderResponses = orders.stream()
                 .map(this::mapToDto)
                 .toList();
-        return orderDtos;
+        return orderResponses;
     }
 
     @Override
     @Transactional
-    public OrderDto updateOrderStatus(Long orderId, OrderStatus orderStatus) {
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus orderStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         if (orderStatus == OrderStatus.SHIPPED && order.getPaymentStatus() == PaymentStatus.FAILED) {
@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDto updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
+    public OrderResponse updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         if (paymentStatus == PaymentStatus.PAID && order.getOrderStatus() == OrderStatus.PENDING) {
@@ -92,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDto placeOrder(OrderRequest orderRequest) {
+    public OrderResponse placeOrder(OrderRequest orderRequest) {
         User user = getCurrentUser();
         Long productId = orderRequest.getProductId();
         Product product = productRepository.findById(productId)
@@ -202,8 +202,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // Map to DTO
-    private OrderItemDto orderItemDtoConversion(OrderItem orderItem) {
-        return OrderItemDto.builder()
+    private OrderItemResponse orderItemDtoConversion(OrderItem orderItem) {
+        return OrderItemResponse.builder()
                 .id(orderItem.getId())
                 .orderId(orderItem.getOrder().getId())
                 .productId(orderItem.getProduct().getId())
@@ -212,8 +212,8 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    private OrderDto mapToDto(Order order) {
-        List<OrderItemDto> orderItemDtos = order.getOrderItems()
+    private OrderResponse mapToDto(Order order) {
+        List<OrderItemResponse> orderItemResponses = order.getOrderItems()
                 .stream()
                 .map(this::orderItemDtoConversion)
                 .toList();
@@ -221,11 +221,11 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .map(item -> item.getPriceAtPurchase().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return OrderDto.builder()
+        return OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
                 .userName(order.getUser().getName())
-                .orderItems(orderItemDtos)
+                .orderItems(orderItemResponses)
                 .totalAmount(totalAmount)
                 .paymentMethod(order.getPaymentMethod())
                 .orderDate(order.getOrderDate())
