@@ -4,20 +4,16 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.myProject.user.entity.Role;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.myProject.category.entity.Category;
 import com.myProject.category.repository.CategoryRepository;
 import com.myProject.exception.ResourceNotFoundException;
 import com.myProject.product.dto.NewProductRequest;
@@ -102,9 +98,10 @@ public class ProductService {
     public ProductResponse createNewProduct(NewProductRequest newProductRequest) {
         log.info("Creating product with name: " + newProductRequest.getName());
         simulateSlowDbCall();
-        // Check if category exists by id and store it in an object
-        Category category = categoryRepository.findById(newProductRequest.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + newProductRequest.getCategoryId()));
+        // Check if category exists by id
+        if (!categoryRepository.existsById(newProductRequest.getCategoryId())) {
+            throw new ResourceNotFoundException("Category not found with ID: " + newProductRequest.getCategoryId());
+        }
         // Convert NewProductDto to Product 
         Product product = modelMapper.map(newProductRequest, Product.class);
         product.setUser(getCurrentUser());
@@ -142,8 +139,9 @@ public class ProductService {
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
     public void deleteProductById(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        if (productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product not found with ID: " + id);
+        }
         productRepository.deleteById(id);
     }
 

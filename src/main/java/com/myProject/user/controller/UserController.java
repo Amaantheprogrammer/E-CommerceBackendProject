@@ -1,13 +1,18 @@
 package com.myProject.user.controller;
 
-import java.util.List;
-
-import com.myProject.user.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.myProject.user.dto.UpdateUserRequest;
 import com.myProject.user.dto.UserResponse;
+import com.myProject.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,9 +24,7 @@ public class UserController {
     private final UserService userService;
     
     @GetMapping
-    public ResponseEntity<?> getUsers(
-            @RequestParam(value = "email", required = false) String email
-    ) {
+    public ResponseEntity<?> getUsers(@RequestParam(required = false) String email) {
         if (email != null && !email.isBlank()) {
             return ResponseEntity.ok(userService.getUserByEmail(email));
         }

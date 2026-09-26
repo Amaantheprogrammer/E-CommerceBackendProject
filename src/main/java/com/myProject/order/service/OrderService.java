@@ -14,9 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.myProject.exception.BadRequestException;
 import com.myProject.exception.ResourceNotFoundException;
-import com.myProject.order.dto.OrderResponse;
-import com.myProject.order.dto.OrderItemResponse;
 import com.myProject.order.dto.OrderRequest;
+import com.myProject.order.dto.OrderResponse;
 import com.myProject.order.entity.Order;
 import com.myProject.order.entity.OrderItem;
 import com.myProject.order.entity.OrderStatus;
@@ -31,7 +30,6 @@ import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.ui.ModelMap;
 
 @Service
 @RequiredArgsConstructor
@@ -198,8 +196,6 @@ public class OrderService {
         String email = authentication.getName();
 
         return userRepository.findByEmail(email)
-                .orElseThrow(()
-                        -> new ResourceNotFoundException(
-                        "Authenticated user not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
     }
 }
