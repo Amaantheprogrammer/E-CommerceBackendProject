@@ -2,6 +2,7 @@ package com.myProject.category.controller;
 
 import java.util.List;
 
+import com.myProject.category.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.myProject.category.dto.CategoryDto;
-import com.myProject.category.dto.NewCategoryDto;
-import com.myProject.category.service.CategoryService;
+import com.myProject.category.dto.CategoryResponse;
+import com.myProject.category.dto.NewCategoryRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,22 +27,22 @@ public class CategoryController {
     private final CategoryService categoryService;
     
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> getAllCategories() {
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
     
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody NewCategoryDto newCategoryDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(newCategoryDto));
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody NewCategoryRequest newCategoryRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(newCategoryRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @RequestBody NewCategoryDto newCategoryDto) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, newCategoryDto));
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody NewCategoryRequest newCategoryRequest) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, newCategoryRequest));
     }
 }

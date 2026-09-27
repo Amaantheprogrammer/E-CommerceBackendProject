@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NewCategoryDto {
+public class NewCategoryRequest {
     @NotBlank(message = "Name field is required")
     private String name;
 }

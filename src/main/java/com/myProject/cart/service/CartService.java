@@ -1,14 +1,15 @@
 package com.myProject.cart.service;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.myProject.cart.dto.CartDto;
-import com.myProject.cart.dto.CartItemDto;
+import com.myProject.cart.dto.CartResponse;
 import com.myProject.cart.entity.Cart;
 import com.myProject.cart.entity.CartItem;
 import com.myProject.cart.repository.CartRepository;
@@ -23,30 +24,29 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CartServiceImpl implements CartService {
+public class CartService {
 
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ModelMapper modelMapper;
 
-    @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public CartDto getCartByUserId(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+    public CartResponse getMyCart() {
+        User user = getCurrentUser();
         Cart cart = user.getCart();
         if (cart == null) {
             cart = Cart.builder().user(user).build();
             cart = cartRepository.save(cart);
         }
-        return mapToDto(cart);
+        return modelMapper.map(cart, CartResponse.class);
     }
-
-    @Override
+    
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER','SELLER')")
     @Transactional
-    public CartDto updateItemQuantity(Long userId, Long productId, Integer quantity) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+    public CartResponse updateItemQuantity(Long productId, Integer quantity) {
+        User user = getCurrentUser();
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
         Cart cart = user.getCart();
@@ -82,20 +82,19 @@ public class CartServiceImpl implements CartService {
                     .build();
             cart.getCartItems().add(newItem);
         }
-        return mapToDto(cartRepository.save(cart));
+        return modelMapper.map(cartRepository.save(cart), CartResponse.class);
     }
-
-    @Override
+    
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER','SELLER')")
     @Transactional
-    public CartDto removeProductFromCart(Long userId, Long productId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));      
+    public CartResponse removeProductFromCart(Long productId) {
+        User user = getCurrentUser();
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product not found with ID: " + productId);
         }     
         Cart cart = user.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) {
-            throw new ResourceNotFoundException("Cart is empty or does not exist for user ID: " + userId);
+            throw new ResourceNotFoundException("Cart is empty or does not exist for user ID: " + user.getId());
         }
         Optional<CartItem> itemToRemove = cart.getCartItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
@@ -105,45 +104,23 @@ public class CartServiceImpl implements CartService {
         } else {
             throw new ResourceNotFoundException("Product with ID: " + productId + " is not inside this cart");
         }
-        return mapToDto(cartRepository.save(cart));
+        return modelMapper.map(cartRepository.save(cart), CartResponse.class);
     }
     
-    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER','SELLER')")
     @Transactional
-    public void clearCart(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+    public void clearCart() {
+        User user = getCurrentUser();
         Cart cart = user.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) return;
         cart.getCartItems().clear();
         cartRepository.save(cart);
     }
 
-    // Mapping to DTO
-    private CartItemDto cartItemToDto(CartItem cartItem) {
-        return CartItemDto.builder()
-                .id(cartItem.getId())
-                .cartId(cartItem.getCart().getId())
-                .productId(cartItem.getProduct().getId())
-                .productName(cartItem.getProduct().getName())
-                .productPrice(cartItem.getProduct().getPrice())
-                .quantity(cartItem.getQuantity())
-                .subtotal(cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())))
-                .build();
-    }
-
-    private CartDto mapToDto(Cart cart) {
-        List<CartItemDto> cartItemDtos = cart.getCartItems().stream().map(this::cartItemToDto).toList();
-
-        BigDecimal total = cartItemDtos.stream()
-                .map(CartItemDto::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return CartDto.builder()
-                .id(cart.getId())
-                .userId(cart.getUser().getId())
-                .userName(cart.getUser().getName())
-                .cartItems(cartItemDtos)
-                .total(total)
-                .build();
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 }

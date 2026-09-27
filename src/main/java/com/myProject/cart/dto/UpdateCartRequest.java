@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateCartDto {
-    @NotNull(message = "User ID is a required field")
-    private Long userId;
+public class UpdateCartRequest {
 
     @NotNull(message = "Product ID is a required field")
     private Long productId;

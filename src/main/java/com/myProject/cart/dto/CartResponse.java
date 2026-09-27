@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CartDto {
+public class CartResponse {
     private Long id;
     private Long userId;
     private String userName;
-    private List<CartItemDto> cartItems;
+    private List<CartItemResponse> cartItems;
     private BigDecimal total;
 }
