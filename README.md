@@ -1,8 +1,8 @@
 # 🛒 E-Commerce Backend Web Application
 
-A scalable and secure RESTful E-Commerce Backend built using **Spring Boot**, **Spring Security**, **JWT Authentication**, **Hibernate/JPA**, and **MySQL**.
+A secure, highly scalable enterprise-grade e-commerce backend built with **Spring Boot**, featuring robust RESTful APIs, strict role-based access control, transaction management, and performance-optimized caching.
 
-This project follows a layered architecture and implements role-based access control (RBAC) to provide secure access to resources such as users, products, categories, and orders.
+🌐 **Live Application:** [https://e-commercebackendproject.onrender.com](https://e-commercebackendproject.onrender.com)
 
 ---
 
@@ -90,57 +90,27 @@ This project follows a layered architecture and implements role-based access con
 ## 📁 Project Structure
 
 ```text
-src/main/java/com/myProject/E_CommerceBackendProject
+src/main/java/com/myProject
 
 ├── auth
-│   ├── controller
-│   ├── dto
-│   └── service
-│
+├── cart
 ├── category
-│   ├── controller
-│   ├── dto
-│   ├── entity
-│   ├── repository
-│   └── service
-│
 ├── order
-│   ├── controller
-│   ├── dto
-│   ├── entity
-│   ├── repository
-│   └── service
-│
+├── payment
 ├── product
-│   ├── controller
-│   ├── dto
-│   ├── entity
-│   ├── repository
-│   └── service
-│
 ├── user
-│   ├── controller
-│   ├── dto
-│   ├── entity
-│   ├── repository
-│   └── service
 │
 ├── security
 │   ├── jwt
-│   │   ├── JwtService
-│   │   └── JwtAuthFilter
-│   │
 │   └── user
-│       └── CustomUserDetailsService
 │
 ├── config
-│   └── SecurityConfig
 │
 ├── exception
-│   ├── ApiError
-│   ├── BadRequestException
-│   ├── ResourceNotFoundException
-│   └── GlobalExceptionHandler
+│
+├── audit
+│
+├── health
 │
 └── ECommerceBackendProjectApplication
 ```
@@ -184,7 +154,7 @@ ROLE_SELLER
 ### Endpoint
 
 ```http
-POST /api/v1/auth/register
+POST /auth/sign-up
 ```
 
 ### Request Body
@@ -211,7 +181,7 @@ POST /api/v1/auth/register
 ### Endpoint
 
 ```http
-POST /api/v1/auth/login
+POST /auth/sign-in
 ```
 
 ### Request Body
@@ -269,12 +239,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 ## application.properties
 
 ```properties
-server.port=5048
-server.servlet.context-path=/api/v1
-
-spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce_db
-spring.datasource.username=root
-spring.datasource.password=your_password
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
@@ -311,12 +278,6 @@ cd ecommerce-backend
 ./mvnw spring-boot:run
 ```
 
-Application will start at:
-
-```text
-http://localhost:5048/api/v1
-```
-
 ---
 
 # 📋 Sample Protected Request
@@ -324,7 +285,7 @@ http://localhost:5048/api/v1
 ### Get Products
 
 ```http
-GET /api/v1/products
+GET /products
 Authorization: Bearer <jwt-token>
 ```
 
@@ -407,12 +368,9 @@ This project demonstrates:
 - Refresh Tokens
 - Email Verification
 - Password Reset
-- Shopping Cart
 - Wishlist
 - Product Images
 - Swagger/OpenAPI Documentation
-- Docker Support
-- Redis Caching
 - Unit Testing
 - Integration Testing
 - CI/CD Pipeline
