@@ -14,7 +14,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 public class RedisConfig {
     @Bean 
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        return RedisCacheManager.builder()
+        return RedisCacheManager.builder(connectionFactory)
                 .withCacheConfiguration(
                     "products",
                     RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30))
