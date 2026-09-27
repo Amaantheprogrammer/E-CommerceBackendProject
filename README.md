@@ -154,7 +154,7 @@ ROLE_SELLER
 ### Endpoint
 
 ```http
-POST /api/v1/auth/register
+POST /auth/sign-up
 ```
 
 ### Request Body
@@ -181,7 +181,7 @@ POST /api/v1/auth/register
 ### Endpoint
 
 ```http
-POST /api/v1/auth/login
+POST /auth/sign-in
 ```
 
 ### Request Body
