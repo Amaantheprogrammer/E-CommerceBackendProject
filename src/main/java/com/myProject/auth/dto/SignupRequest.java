@@ -1,8 +1,14 @@
 package com.myProject.auth.dto;
 
 import com.myProject.user.entity.PaymentMethod;
-import jakarta.validation.constraints.*;
-import lombok.*;
+
+import com.myProject.user.entity.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -21,4 +27,7 @@ public class SignupRequest {
 
     @NotBlank(message = "Payment method is a required field")
     private PaymentMethod paymentMethod;
+
+    @NotBlank(message = "Role is a required field")
+    private Role role;
 }

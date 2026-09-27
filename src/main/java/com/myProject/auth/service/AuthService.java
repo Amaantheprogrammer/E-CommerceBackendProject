@@ -1,6 +1,5 @@
 package com.myProject.auth.service;
 
-import com.myProject.auth.dto.SignupRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.myProject.auth.dto.AuthResponse;
 import com.myProject.auth.dto.SignInRequest;
+import com.myProject.auth.dto.SignupRequest;
 import com.myProject.security.jwt.JwtService;
 import com.myProject.user.entity.Role;
 import com.myProject.user.entity.User;
@@ -47,14 +47,16 @@ public class AuthService {
 
     @Transactional
     public void signUp(SignupRequest request) {
+        if (request.getRole() == Role.ROLE_ADMIN) {
+                throw new IllegalArgumentException("Cannot sign-up as admin");
+        }
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .paymentMethod(request.getPaymentMethod())
-                .role(Role.ROLE_USER)
+                .role(request.getRole())
                 .build();
-
         userRepository.save(user);
     }
 

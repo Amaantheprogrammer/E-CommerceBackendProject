@@ -1,5 +1,8 @@
 package com.myProject.user.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.myProject.cart.entity.Cart;
 import com.myProject.payment.entity.BankAccount;
 import com.myProject.product.entity.Product;
@@ -57,6 +60,7 @@ public class User {
     @OneToOne(mappedBy = "user") 
     private BankAccount bankAccount;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private Product product;
+    private List<Product> products = new ArrayList<>();
 }

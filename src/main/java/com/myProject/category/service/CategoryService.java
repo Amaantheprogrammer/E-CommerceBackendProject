@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class CategoryService {
     
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
+    @Cacheable(value = "categories")
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll()
                             .stream()
@@ -36,6 +39,7 @@ public class CategoryService {
     
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
+    @Cacheable(value = "categories", key = "#id")
     public CategoryResponse getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + id));
@@ -51,6 +55,7 @@ public class CategoryService {
     
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     @Transactional
+    @CacheEvict(value = "categories", key = "#id")
     public CategoryResponse updateCategory(Long id, NewCategoryRequest newCategoryRequest) {
         Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + id));

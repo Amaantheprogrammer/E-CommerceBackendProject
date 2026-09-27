@@ -2,6 +2,7 @@ package com.myProject.order.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -131,6 +132,7 @@ public class OrderService {
                         paymentMethod == PaymentMethod.BANK_TRANSFER
                                 ? PaymentStatus.PAID
                                 : PaymentStatus.PENDING)
+                .orderItems(new ArrayList<>())
                 .build();
         OrderItem orderItem = OrderItem.builder()
                 .order(order)
@@ -145,7 +147,7 @@ public class OrderService {
 
         productRepository.save(product);
 
-        return modelMapper.map(order, OrderResponse.class);
+        return modelMapper.map(orderRepository.save(order), OrderResponse.class);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")

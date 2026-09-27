@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -112,6 +113,7 @@ public class ProductService {
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
+    @CacheEvict(value = "products", key = "#id") 
     public ProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
@@ -125,6 +127,7 @@ public class ProductService {
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
+    @CacheEvict(value = "products", key = "#id")
     public ProductResponse updatePartialProduct(Long id, UpdateProductRequest updateProductRequest) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
