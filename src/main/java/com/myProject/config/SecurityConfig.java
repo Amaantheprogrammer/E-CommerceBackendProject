@@ -33,7 +33,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> 
                 auth // Public Endpoints
-                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/", "/auth/**").permitAll()
                     .requestMatchers("/products/*", "/categories/**").permitAll()
                     // User Management
                     .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
