@@ -38,7 +38,6 @@ public class ProductService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     @Cacheable("products")
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
@@ -48,7 +47,6 @@ public class ProductService {
                 .map(product -> modelMapper.map(product, ProductResponse.class));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
@@ -69,7 +67,6 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
         log.info(">>> Fetching product with name: " + name + " and price: " + price);
