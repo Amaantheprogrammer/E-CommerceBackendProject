@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -44,28 +47,36 @@ public class OrderService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public List<OrderResponse> getAllOrders() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(order -> modelMapper.map(order, OrderResponse.class))
-                .collect(Collectors.toList());
+    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+        Page<Order> orders = orderRepository.findAllOrders(pageable);
+        return orders.map(order -> modelMapper.map(order, OrderResponse.class));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public OrderResponse getByOrderId(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+    public OrderResponse getOrderById(Long orderId) {
+        Order order = orderRepository.findOrderById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         return modelMapper.map(order, OrderResponse.class);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public List<OrderResponse> getByUserId(Long userId) {
+    public List<OrderResponse> getOrderByUserId(Long userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
         return orders.stream()
                 .map(order -> modelMapper.map(order, OrderResponse.class))
                 .collect(Collectors.toList());
+    }
+    
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getMyOrders() {
+        User user = getCurrentUser();
+        List<Order> orders = user.getOrders();
+        return orders.stream()
+                    .map(order -> modelMapper.map(order, OrderResponse.class))
+                    .collect(Collectors.toList());
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -73,11 +84,14 @@ public class OrderService {
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus orderStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+        validateOrderAuthority(order);
         if (orderStatus == OrderStatus.SHIPPED && order.getPaymentStatus() == PaymentStatus.FAILED) {
-            throw new IllegalStateException("Cannot ship an order with failed payment status");
+            throw new BadRequestException("Cannot ship an order with payment status " + order.getPaymentStatus() 
+            + " and order status " + orderStatus);
         }
         order.setOrderStatus(orderStatus);
-        return modelMapper.map(order, OrderResponse.class);
+        Order savedOrder = orderRepository.save(order);
+        return modelMapper.map(savedOrder, OrderResponse.class);
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -85,11 +99,13 @@ public class OrderService {
     public OrderResponse updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+        validateOrderAuthority(order);
         if (paymentStatus == PaymentStatus.PAID && order.getOrderStatus() == OrderStatus.PENDING) {
             order.setOrderStatus(OrderStatus.PLACED);
         }
         order.setPaymentStatus(paymentStatus);
-        return modelMapper.map(order, OrderResponse.class);
+        Order savedOrder = orderRepository.save(order);
+        return modelMapper.map(savedOrder, OrderResponse.class);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
@@ -105,17 +121,14 @@ public class OrderService {
         PaymentMethod paymentMethod = orderRequest.getPaymentMethod();
         Integer stockQuantity = product.getStockQuantity();
         if (stockQuantity < quantity) {
-            throw new BadRequestException(
-                    "Insufficient stock for product: "
-                    + product.getName());
+            throw new BadRequestException("Insufficient stock for product: " + product.getName());
         }
         BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
             BankAccount bankAccount = bankAccountRepository.findByUser_Id(user.getId())
                             .orElseThrow(()-> new ResourceNotFoundException("Bank account not found for user"));
             if (bankAccount.getBalance().compareTo(totalAmount) < 0) {
-                throw new BadRequestException(
-                        "Insufficient balance in the account");
+                throw new BadRequestException("Insufficient balance in the account");
             }
 
             bankAccount.setBalance(bankAccount.getBalance().subtract(totalAmount));
@@ -155,19 +168,14 @@ public class OrderService {
     public void cancelOrder(Long orderId) {
         User currentUser = getCurrentUser();
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(()
-                        -> new ResourceNotFoundException(
-                        "Order not found with ID: " + orderId));
+                .orElseThrow(()-> new ResourceNotFoundException("Order not found with ID: " + orderId));
 
         if (!order.getUser().getId().equals(currentUser.getId())) {
-            throw new BadRequestException(
-                    "You can only cancel your own orders");
+            throw new AuthorizationDeniedException("You can only cancel your own orders");
         }
         if (order.getOrderStatus() == OrderStatus.DELIVERED
                 || order.getOrderStatus() == OrderStatus.CANCELLED) {
-            throw new BadRequestException(
-                    "Cannot cancel an order with order status: "
-                    + order.getOrderStatus());
+            throw new BadRequestException("Cannot cancel an order with order status: " + order.getOrderStatus());
         }
         order.getOrderItems().forEach(item -> {
             Product product = item.getProduct();
@@ -191,13 +199,18 @@ public class OrderService {
     }
 
     private User getCurrentUser() {
-
-        Authentication authentication
-                = SecurityContextHolder.getContext().getAuthentication();
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
+    }
+
+    private void validateOrderAuthority(Order order) {
+        Long currentUserId = getCurrentUser().getId();
+        order.getOrderItems().forEach(item -> {
+            if (!item.getProduct().getUser().getId().equals(currentUserId)) {
+                throw new AuthorizationDeniedException("You cannot update orders containing products owned by another seller");
+            }
+        });
     }
 }

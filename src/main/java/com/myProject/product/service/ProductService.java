@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class ProductService {
     private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
-    @Cacheable("products")
+    @Cacheable(value = "products")
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
         log.info(">>> Fetching all products from the database");
         simulateSlowDbCall();
@@ -59,22 +60,13 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "productsByNameContainingIgnoreCase", key = "#name")
-    public List<ProductResponse> getProductByNameContainingIgnoreCase(String name) {
-        log.info(">>> Fetching product with name: " + name);
-        simulateSlowDbCall();
-        List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
-        return products.stream()
-                .map(product -> modelMapper.map(product, ProductResponse.class))
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
     @Cacheable(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", key = "#name + '_' + #price")
     public List<ProductResponse> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
         log.info(">>> Fetching product with name: " + name + " and price: " + price);
         simulateSlowDbCall();
-        List<Product> products = productRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price);
+        List<Product> products = (price != null) 
+                                ? productRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price) 
+                                : productRepository.findByNameContainingIgnoreCase(name);
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductResponse.class))
                 .collect(Collectors.toList());
@@ -93,6 +85,17 @@ public class ProductService {
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductResponse.class))
                 .collect(Collectors.toList());
+    }
+    
+    @PreAuthorize("hasRole('SELLER')")
+    @Transactional(readOnly = true)
+    @Cacheable(value = "myProducts")
+    public List<ProductResponse> getMyProducts() {
+        User user = getCurrentUser();
+        List<Product> products = user.getProducts();
+        return products.stream()
+                    .map(product -> modelMapper.map(product, ProductResponse.class))
+                    .collect(Collectors.toList());
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -130,6 +133,7 @@ public class ProductService {
     public ProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        validateProductAuthority(product);
         if (updateProductRequest.getName() != null) {
             product.setName(updateProductRequest.getName());
         }
@@ -156,9 +160,9 @@ public class ProductService {
         @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
     public void deleteProductById(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Product not found with ID: " + id);
-        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        validateProductAuthority(product);
         productRepository.deleteById(id);
     }
 
@@ -176,5 +180,11 @@ public class ProductService {
         String email = authentication.getName();
         return userRepository.findByEmail(email)
                             .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+    }
+
+    private void validateProductAuthority(Product product) {
+        if (!product.getUser().getId().equals(getCurrentUser().getId())) {
+            throw new AuthorizationDeniedException("You cannot update products of other sellers");
+        }
     }
 }

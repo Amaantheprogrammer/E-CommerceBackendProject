@@ -28,23 +28,23 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> 
-                auth // Public Endpoints
-                    .requestMatchers("/", 
-                                        "/auth/**",
-                                        "/swagger-ui/**",
-                                        "/v3/api-docs/**",
-                                        "/swagger-ui.html",
-                                        "/products/*",
-                                        "/categories/**"
-                                    ).permitAll()
-                    .anyRequest().authenticated()
+        return http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> 
+                    auth // Public Endpoints
+                        .requestMatchers("/", 
+                                            "/auth/**",
+                                            "/swagger-ui/**",
+                                            "/v3/api-docs/**",
+                                            "/swagger-ui.html",
+                                            "/products/**",
+                                            "/categories/**"
+                                        ).permitAll()
+                        .anyRequest().authenticated()
 
-            )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

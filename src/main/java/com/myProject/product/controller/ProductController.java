@@ -63,10 +63,7 @@ public class ProductController {
         GET /products/search?name=phone              → name search only
         GET /products/search?name=phone&price=500 → name + price filter
         */
-        if (price != null) {
-            return ResponseEntity.ok(productService.getProductByNameContainingIgnoreCaseAndPriceLessThan(name, price));
-        }
-        return ResponseEntity.ok(productService.getProductByNameContainingIgnoreCase(name));
+        return ResponseEntity.ok(productService.getProductByNameContainingIgnoreCaseAndPriceLessThan(name, price));
     }
     
     @GetMapping("/category/{id}")

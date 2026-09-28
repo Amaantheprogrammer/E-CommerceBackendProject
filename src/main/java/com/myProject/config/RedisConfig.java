@@ -16,7 +16,19 @@ public class RedisConfig {
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         return RedisCacheManager.builder(connectionFactory)
                 .withCacheConfiguration(
-                    "products",
+                    "products", 
+                    RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30))
+                )
+                .withCacheConfiguration(
+                    "productsById", 
+                    RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30))
+                )
+                .withCacheConfiguration(
+                    "productsByNameContainingIgnoreCaseAndPriceLessThan", 
+                    RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30))
+                )
+                .withCacheConfiguration(
+                    "productsByCategoryIdAndPriceLessThan", 
                     RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30))
                 )
                 .withCacheConfiguration(
@@ -25,6 +37,14 @@ public class RedisConfig {
                 )
                 .withCacheConfiguration(
                     "users",
+                    RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10))
+                )
+                .withCacheConfiguration(
+                    "usersById",
+                    RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10))
+                )
+                .withCacheConfiguration(
+                    "usersByEmail",
                     RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10))
                 )
                 .build();

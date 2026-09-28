@@ -68,6 +68,11 @@ public class Order {
     @Column(name = "payment_status", nullable = false)
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    public Order orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    }
 }
 // Set OrderStatus and PaymentStatus as PENDING by default
 

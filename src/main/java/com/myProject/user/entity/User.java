@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.myProject.cart.entity.Cart;
+import com.myProject.order.entity.Order;
 import com.myProject.payment.entity.BankAccount;
 import com.myProject.product.entity.Product;
 
@@ -63,4 +64,8 @@ public class User {
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
+    
+    @Builder.Default
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
 }
