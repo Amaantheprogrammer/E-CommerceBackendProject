@@ -48,6 +48,7 @@ public class CategoryService {
     
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     @Transactional
+    @CacheEvict(value = "categories", key = "#id")
     public CategoryResponse createCategory(NewCategoryRequest newCategoryRequest) {
         Category category = Category.builder().name(newCategoryRequest.getName()).build();
         return modelMapper.map(categoryRepository.save(category), CategoryResponse.class);
