@@ -63,4 +63,11 @@ public class CategoryService {
         category.setName(newCategoryRequest.getName());
         return modelMapper.map(categoryRepository.save(category), CategoryResponse.class);
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @Transactional
+    @CacheEvict(value = "categories", allEntries = true)
+    public void deleteCategoryById(Long id) {
+        categoryRepository.deleteById(id);
+    }
 }

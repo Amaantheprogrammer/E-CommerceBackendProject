@@ -2,9 +2,9 @@ package com.myProject.category.controller;
 
 import java.util.List;
 
-import com.myProject.category.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.myProject.category.dto.CategoryResponse;
 import com.myProject.category.dto.NewCategoryRequest;
+import com.myProject.category.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,5 +45,11 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody NewCategoryRequest newCategoryRequest) {
         return ResponseEntity.ok(categoryService.updateCategory(id, newCategoryRequest));
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable Long id) {
+        categoryService.deleteCategoryById(id);
+        return ResponseEntity.noContent().build();
     }
 }
