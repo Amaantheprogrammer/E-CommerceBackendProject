@@ -2,7 +2,6 @@ package com.myProject.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -33,8 +32,14 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> 
                 auth // Public Endpoints
-                    .requestMatchers("/", "/auth/**").permitAll()
-                    .requestMatchers("/products/*", "/categories/**").permitAll()
+                    .requestMatchers("/", 
+                                        "/auth/**",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui.html",
+                                        "/products/*",
+                                        "/categories/**"
+                                    ).permitAll()
                     .anyRequest().authenticated()
 
             )

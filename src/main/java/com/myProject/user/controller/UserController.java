@@ -14,16 +14,23 @@ import com.myProject.user.dto.UpdateUserRequest;
 import com.myProject.user.dto.UserResponse;
 import com.myProject.user.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor // Objects with "final" keyword get added to the constructor
 @RequestMapping("/users") // Reduces the effort of writing "/users" again and again
+@Tag(name = "Users", description = "User APIs")
 public class UserController {
 
     private final UserService userService;
     
     @GetMapping
+    @Operation(
+        summary = "Get user data",
+        description = "Get all users if email is not passed, otherwise get specific user by email"
+    )
     public ResponseEntity<?> getUsers(@RequestParam(required = false) String email) {
         if (email != null && !email.isBlank()) {
             return ResponseEntity.ok(userService.getUserByEmail(email));
@@ -32,16 +39,26 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Get user by ID"
+    )
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PatchMapping("/{id}")
+    @Operation(
+        summary = "Update user",
+        description = "Update user by ID and UpdateUserRequest from request body"
+    )
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest updateUserRequest) {
         return ResponseEntity.ok(userService.updateUser(id, updateUserRequest));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+        summary = "Delete user by ID"
+    )
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
         return ResponseEntity.noContent().build();

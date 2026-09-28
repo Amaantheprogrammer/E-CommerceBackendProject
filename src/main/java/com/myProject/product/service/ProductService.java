@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,7 +49,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "products", key = "#id")
+    @Cacheable(value = "productsById", key = "#id")
     public ProductResponse getProductById(Long id) {
         log.info(">>> Fetching product with ID: " + id);
         simulateSlowDbCall();
@@ -58,6 +59,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "productsByNameContainingIgnoreCase", key = "#name")
     public List<ProductResponse> getProductByNameContainingIgnoreCase(String name) {
         log.info(">>> Fetching product with name: " + name);
         simulateSlowDbCall();
@@ -68,6 +70,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", key = "#name + '_' + #price")
     public List<ProductResponse> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
         log.info(">>> Fetching product with name: " + name + " and price: " + price);
         simulateSlowDbCall();
@@ -78,6 +81,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "productsByCategoryIdAndPriceLessThan", key = "#id + '_' + #price")
     public List<ProductResponse> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price) {
         log.info(">>> Fetching product with id: " + id + " and price: " + price);
         if (!categoryRepository.existsById(id)) {
@@ -93,6 +97,12 @@ public class ProductService {
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "products", allEntries = true),
+        @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
+        @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+        @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
+    })
     public ProductResponse createNewProduct(NewProductRequest newProductRequest) {
         log.info("Creating product with name: " + newProductRequest.getName());
         simulateSlowDbCall();
@@ -110,7 +120,13 @@ public class ProductService {
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
-    @CacheEvict(value = "products", key = "#id") 
+    @Caching(evict = {
+        @CacheEvict(value = "products", allEntries = true),
+        @CacheEvict(value = "productsById", key = "#id"),
+        @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
+        @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+        @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
+    })
     public ProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
@@ -124,7 +140,13 @@ public class ProductService {
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
-    @CacheEvict(value = "products", key = "#id")
+    @Caching(evict = {
+        @CacheEvict(value = "products", allEntries = true),
+        @CacheEvict(value = "productsById", key = "#id"),
+        @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
+        @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+        @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
+    })
     public ProductResponse updatePartialProduct(Long id, UpdateProductRequest updateProductRequest) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
@@ -138,8 +160,15 @@ public class ProductService {
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "products", allEntries = true),
+        @CacheEvict(value = "productsById", key = "#id"),
+        @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
+        @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+        @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
+    })
     public void deleteProductById(Long id) {
-        if (productRepository.existsById(id)) {
+        if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product not found with ID: " + id);
         }
         productRepository.deleteById(id);
