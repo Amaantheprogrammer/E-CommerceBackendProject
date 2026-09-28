@@ -64,9 +64,9 @@ public class ProductService {
     public List<ProductResponse> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
         log.info(">>> Fetching product with name: " + name + " and price: " + price);
         simulateSlowDbCall();
-        List<Product> products = (price != null) 
-                                ? productRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price) 
-                                : productRepository.findByNameContainingIgnoreCase(name);
+        List<Product> products = (price != null)
+                ? productRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price)
+                : productRepository.findByNameContainingIgnoreCase(name);
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductResponse.class))
                 .collect(Collectors.toList());
@@ -86,7 +86,7 @@ public class ProductService {
                 .map(product -> modelMapper.map(product, ProductResponse.class))
                 .collect(Collectors.toList());
     }
-    
+
     @PreAuthorize("hasRole('SELLER')")
     @Transactional(readOnly = true)
     @Cacheable(value = "myProducts")
@@ -94,17 +94,17 @@ public class ProductService {
         User user = getCurrentUser();
         List<Product> products = user.getProducts();
         return products.stream()
-                    .map(product -> modelMapper.map(product, ProductResponse.class))
-                    .collect(Collectors.toList());
+                .map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
     }
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "products", allEntries = true),
-        @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
-        @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
-        @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
+            @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
     public ProductResponse createNewProduct(NewProductRequest newProductRequest) {
         log.info("Creating product with name: " + newProductRequest.getName());
@@ -113,7 +113,7 @@ public class ProductService {
         if (!categoryRepository.existsById(newProductRequest.getCategoryId())) {
             throw new ResourceNotFoundException("Category not found with ID: " + newProductRequest.getCategoryId());
         }
-        // Convert NewProductDto to Product 
+        // Convert NewProductDto to Product
         Product product = modelMapper.map(newProductRequest, Product.class);
         product.setUser(getCurrentUser());
         // Save in database as product and return productDto
@@ -124,11 +124,11 @@ public class ProductService {
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "products", allEntries = true),
-        @CacheEvict(value = "productsById", key = "#id"),
-        @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
-        @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
-        @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "productsById", key = "#id"),
+            @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
+            @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
     public ProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest) {
         Product product = productRepository.findById(id)
@@ -153,11 +153,11 @@ public class ProductService {
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "products", allEntries = true),
-        @CacheEvict(value = "productsById", key = "#id"),
-        @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
-        @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
-        @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "productsById", key = "#id"),
+            @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
+            @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
     public void deleteProductById(Long id) {
         Product product = productRepository.findById(id)
@@ -174,12 +174,13 @@ public class ProductService {
             Thread.currentThread().interrupt();
         }
     }
+
     // Get Current User
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         return userRepository.findByEmail(email)
-                            .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
     private void validateProductAuthority(Product product) {
