@@ -48,7 +48,7 @@ public class CategoryService {
     
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     @Transactional
-    @CacheEvict(value = "categories", key = "#id")
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse createCategory(NewCategoryRequest newCategoryRequest) {
         Category category = Category.builder().name(newCategoryRequest.getName()).build();
         return modelMapper.map(categoryRepository.save(category), CategoryResponse.class);
@@ -56,7 +56,7 @@ public class CategoryService {
     
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     @Transactional
-    @CacheEvict(value = "categories", key = "#id")
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse updateCategory(Long id, NewCategoryRequest newCategoryRequest) {
         Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + id));
