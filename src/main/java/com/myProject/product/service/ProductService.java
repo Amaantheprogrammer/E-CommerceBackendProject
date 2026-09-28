@@ -130,30 +130,18 @@ public class ProductService {
     public ProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
-        product.setName(updateProductRequest.getName());
-        product.setPrice(updateProductRequest.getPrice());
-        product.setDescription(updateProductRequest.getDescription());
-        product.setStockQuantity(updateProductRequest.getStockQuantity());
-        Product savedProduct = productRepository.save(product);
-        return modelMapper.map(savedProduct, ProductResponse.class);
-    }
-
-    @PreAuthorize("hasRole('SELLER')")
-    @Transactional
-    @Caching(evict = {
-        @CacheEvict(value = "products", allEntries = true),
-        @CacheEvict(value = "productsById", key = "#id"),
-        @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
-        @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
-        @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
-    })
-    public ProductResponse updatePartialProduct(Long id, UpdateProductRequest updateProductRequest) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
-        if (updateProductRequest.getName() != null) product.setName(updateProductRequest.getName());
-        if (updateProductRequest.getPrice() != null) product.setPrice(updateProductRequest.getPrice());
-        if (updateProductRequest.getDescription() != null) product.setDescription(updateProductRequest.getDescription());
-        if (updateProductRequest.getStockQuantity() != null) product.setStockQuantity(updateProductRequest.getStockQuantity());
+        if (updateProductRequest.getName() != null) {
+            product.setName(updateProductRequest.getName());
+        }
+        if (updateProductRequest.getPrice() != null) {
+            product.setPrice(updateProductRequest.getPrice());
+        }
+        if (updateProductRequest.getDescription() != null) {
+            product.setDescription(updateProductRequest.getDescription());
+        }
+        if (updateProductRequest.getStockQuantity() != null) {
+            product.setStockQuantity(updateProductRequest.getStockQuantity());
+        }
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
     }

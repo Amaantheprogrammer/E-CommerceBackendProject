@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -87,22 +86,13 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createNewProduct(newProductRequest));
     }
 
-    @PutMapping("/{id}")
-    @Operation(
-        summary = "Update product",
-        description = "Update product by ID and UpdateProductRequest object from the request body"
-    )
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody UpdateProductRequest updateProductRequest) {
-        return ResponseEntity.ok(productService.updateProduct(id, updateProductRequest));
-    }
-
     @PatchMapping("/{id}")
     @Operation(
         summary = "Update product",
-        description = "Update product by ID and UpdateProductRequest object from the request body"
+        description = "Update product partially by ID and UpdateProductRequest object from the request body"
     )
-    public ResponseEntity<ProductResponse> updatePartialProduct(@PathVariable Long id, @RequestBody UpdateProductRequest updateProductRequest) {
-        return ResponseEntity.ok(productService.updatePartialProduct(id, updateProductRequest));
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody UpdateProductRequest updateProductRequest) {
+        return ResponseEntity.ok(productService.updateProduct(id, updateProductRequest));
     }
 
     @DeleteMapping("/{id}")
