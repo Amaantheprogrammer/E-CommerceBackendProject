@@ -1,6 +1,7 @@
 // For user updation
 package com.myProject.user.dto;
 
+import com.myProject.user.entity.PaymentMethod;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,4 +14,5 @@ public class UpdateUserRequest {
     private String name;
     @Email
     private String email;
+    private PaymentMethod paymentMethod;
 }

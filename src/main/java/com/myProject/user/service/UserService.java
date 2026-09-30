@@ -79,6 +79,9 @@ public class UserService {
         if (updateUserRequest.getEmail() != null) {
             user.setEmail(updateUserRequest.getEmail());
         }
+        if (updateUserRequest.getPaymentMethod() != null && user.getPaymentMethod() != updateUserRequest.getPaymentMethod()) {
+            user.setPaymentMethod(updateUserRequest.getPaymentMethod());
+        }
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserResponse.class);
     }
