@@ -30,7 +30,7 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "products", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> productImages = new ArrayList<>();
     
     @Column(nullable = false, precision = 10, scale = 2) // Up to 10 digits and rounded to 2 decimal place
