@@ -25,6 +25,7 @@ public class Wishlist {
     private User user;
 
     @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<WishlistItem> wishlistItems = new ArrayList<>();
 
 }

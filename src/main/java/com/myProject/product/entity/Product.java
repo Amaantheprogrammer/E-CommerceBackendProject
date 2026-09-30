@@ -31,6 +31,7 @@ public class Product {
     private String name;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ProductImage> productImages = new ArrayList<>();
     
     @Column(nullable = false, precision = 10, scale = 2) // Up to 10 digits and rounded to 2 decimal place
