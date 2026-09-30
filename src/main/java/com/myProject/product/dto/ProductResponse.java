@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class ProductResponse implements Serializable {
     private Long id;
     private String name;
+    private String imageUrl;
     private BigDecimal price;
     private String description;
     private Integer stockQuantity;

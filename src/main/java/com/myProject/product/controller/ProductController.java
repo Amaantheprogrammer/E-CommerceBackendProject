@@ -3,19 +3,14 @@ package com.myProject.product.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.myProject.product.dto.UpdateImageRequest;
+import jakarta.validation.Valid;
+import lombok.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.myProject.product.dto.NewProductRequest;
 import com.myProject.product.dto.ProductResponse;
@@ -51,6 +46,14 @@ public class ProductController {
     )
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
+    }
+
+    @GetMapping("/me")
+    @Operation(
+            summary = "Get the seller's own products"
+    )
+    public ResponseEntity<List<ProductResponse>> getMyProducts() {
+        return ResponseEntity.ok(productService.getMyProducts());
     }
 
     @GetMapping("/search")
@@ -90,6 +93,15 @@ public class ProductController {
     )
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody UpdateProductRequest updateProductRequest) {
         return ResponseEntity.ok(productService.updateProduct(id, updateProductRequest));
+    }
+
+    @PutMapping("/image/{id}")
+    @Operation(
+            summary = "Update image"
+    )
+    public ResponseEntity<Void> updateImage(@PathVariable Long id, @Valid @RequestBody UpdateImageRequest updateImageRequest) {
+        productService.updateImage(id, updateImageRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

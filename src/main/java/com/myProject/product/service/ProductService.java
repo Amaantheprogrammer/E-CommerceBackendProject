@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.myProject.product.dto.UpdateImageRequest;
+import com.myProject.product.entity.ProductImage;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -89,7 +91,7 @@ public class ProductService {
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional(readOnly = true)
-    @Cacheable(value = "myProducts")
+    @Cacheable(value = "myProducts", key = "authentication.name")
     public List<ProductResponse> getMyProducts() {
         User user = getCurrentUser();
         List<Product> products = user.getProducts();
@@ -102,7 +104,6 @@ public class ProductService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "products", allEntries = true),
-            @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
             @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
@@ -126,7 +127,6 @@ public class ProductService {
     @Caching(evict = {
             @CacheEvict(value = "products", allEntries = true),
             @CacheEvict(value = "productsById", key = "#id"),
-            @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
             @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
@@ -155,7 +155,27 @@ public class ProductService {
     @Caching(evict = {
             @CacheEvict(value = "products", allEntries = true),
             @CacheEvict(value = "productsById", key = "#id"),
-            @CacheEvict(value = "productsByNameContainingIgnoreCase", allEntries = true),
+            @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "myProducts", allEntries = true)
+    })
+    public void updateImage(Long id, UpdateImageRequest updateImageRequest) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        validateProductAuthority(product);
+        ProductImage productImage =  product.getProductImages()
+                .stream()
+                .filter(image -> image.getId().equals(updateImageRequest.getImageId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found with ID: " + updateImageRequest.getImageId()));
+        productImage.setImageUrl(updateImageRequest.getImageUrl());
+    }
+
+    @PreAuthorize("hasRole('SELLER')")
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "productsById", key = "#id"),
             @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
