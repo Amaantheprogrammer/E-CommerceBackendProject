@@ -59,16 +59,20 @@ public class UserService {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
+    @Transactional(readOnly = true)
+    public UserResponse getMyUser() {
+        return modelMapper.map(getCurrentUser(), UserResponse.class);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     @Caching(evict = {
         @CacheEvict(value = "users", allEntries = true),
-        @CacheEvict(value = "usersById", key = "#id"),
-        @CacheEvict(value = "usersByEmail", key = "#email")     
+        @CacheEvict(value = "usersById", allEntries = true),
+        @CacheEvict(value = "usersByEmail", allEntries = true)
     })
-    public UserResponse updateUser(Long id, UpdateUserRequest updateUserRequest) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-        validateAuthority(user);
+    public UserResponse updateMyUser(UpdateUserRequest updateUserRequest) {
+        User user = getCurrentUser();
         if (updateUserRequest.getName() != null) {
             user.setName(updateUserRequest.getName());
         }
@@ -83,14 +87,12 @@ public class UserService {
     @Transactional
     @Caching(evict = {
         @CacheEvict(value = "users", allEntries = true),
-        @CacheEvict(value = "usersById", key = "#id"),
-        @CacheEvict(value = "usersByEmail", key = "#email")     
+        @CacheEvict(value = "usersById", allEntries = true),
+        @CacheEvict(value = "usersByEmail", allEntries = true)
     })
-    public void deleteUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-        validateAuthority(user);
-        userRepository.deleteById(id);
+    public void deleteMyUser() {
+        Long currentUserId = getCurrentUser().getId();
+        userRepository.deleteById(currentUserId);
     }
 
     private User getCurrentUser() {
@@ -98,11 +100,5 @@ public class UserService {
         String email = authentication.getName();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-    }
-
-    private void validateAuthority(User user) {
-        if (!user.getEmail().equals(getCurrentUser().getEmail())) {
-            throw new AuthorizationDeniedException("Unauthorized action");
-        }
     }
 }

@@ -1,5 +1,7 @@
 package com.myProject.auth.service;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -46,6 +48,11 @@ public class AuthService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "users", allEntries = true),
+            @CacheEvict(value = "usersById", allEntries = true),
+            @CacheEvict(value = "usersByEmail", allEntries = true)
+    })
     public void signUp(SignupRequest request) {
         if (request.getRole() == Role.ROLE_ADMIN) {
                 throw new IllegalArgumentException("Cannot sign-up as admin");

@@ -46,21 +46,29 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PatchMapping("/{id}")
+    @GetMapping("/me")
     @Operation(
-        summary = "Update user",
-        description = "Update user by ID and UpdateUserRequest from request body"
+            summary = "Get user"
     )
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest updateUserRequest) {
-        return ResponseEntity.ok(userService.updateUser(id, updateUserRequest));
+    public ResponseEntity<UserResponse> getMyUser() {
+        return ResponseEntity.ok(userService.getMyUser());
     }
 
-    @DeleteMapping("/{id}")
+    @PatchMapping
     @Operation(
-        summary = "Delete user by ID"
+        summary = "Update user",
+        description = "Update user by UpdateUserRequest from request body"
     )
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUserById(id);
+    public ResponseEntity<UserResponse> updateMyUser(@RequestBody UpdateUserRequest updateUserRequest) {
+        return ResponseEntity.ok(userService.updateMyUser(updateUserRequest));
+    }
+
+    @DeleteMapping
+    @Operation(
+        summary = "Delete user"
+    )
+    public ResponseEntity<Void> deleteUser() {
+        userService.deleteMyUser();
         return ResponseEntity.noContent().build();
     }
 }
