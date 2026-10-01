@@ -15,7 +15,7 @@ import java.util.*;
 public class ProductResponse implements Serializable {
     private Long id;
     private String name;
-    private List<ProductImage> productImages;
+    private List<ImageResponse> productImages;
     private BigDecimal price;
     private String description;
     private Integer stockQuantity;
