@@ -11,5 +11,4 @@ import java.io.Serializable;
 public class ImageResponse implements Serializable {
     private Long id;
     private Long imageUrl;
-    private Long productId;
 }
