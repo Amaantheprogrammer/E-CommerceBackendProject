@@ -10,5 +10,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ImageResponse implements Serializable {
     private Long id;
-    private Long imageUrl;
+    private String imageUrl;
 }
