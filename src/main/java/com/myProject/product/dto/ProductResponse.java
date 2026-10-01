@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.myProject.product.entity.ProductImage;
+import lombok.*;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ProductResponse implements Serializable {
     private Long id;
     private String name;
-    private String imageUrl;
+    private List<ProductImage> productImages;
     private BigDecimal price;
     private String description;
     private Integer stockQuantity;
