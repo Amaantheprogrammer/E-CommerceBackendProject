@@ -3,9 +3,8 @@ package com.myProject.product.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.myProject.product.dto.UpdateImageRequest;
+import com.myProject.product.dto.ImageRequest;
 import jakarta.validation.Valid;
-import lombok.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -95,12 +94,30 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, updateProductRequest));
     }
 
-    @PutMapping("/image/{id}")
+    @PostMapping("/{id}/image")
+    @Operation(
+            summary = "Add image"
+    )
+    public ResponseEntity<Void> addImage(@PathVariable Long id, @Valid @RequestBody ImageRequest imageRequest) {
+        productService.addImage(id, imageRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/image/{imageId}")
     @Operation(
             summary = "Update image"
     )
-    public ResponseEntity<Void> updateImage(@PathVariable Long id, @Valid @RequestBody UpdateImageRequest updateImageRequest) {
-        productService.updateImage(id, updateImageRequest);
+    public ResponseEntity<Void> updateImage(@PathVariable Long id, @PathVariable Long imageId, @Valid @RequestBody ImageRequest imageRequest) {
+        productService.updateImage(id, imageId, imageRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/image/{imageId}")
+    @Operation(
+            summary = "Delete image"
+    )
+    public ResponseEntity<Void> deleteImage(@PathVariable Long id, @PathVariable Long imageId) {
+        productService.deleteImage(id, imageId);
         return ResponseEntity.noContent().build();
     }
 

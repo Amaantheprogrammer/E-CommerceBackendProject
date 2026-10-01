@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
         @ExceptionHandler(ResourceNotFoundException.class)
-        public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+        public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
                 ErrorResponse error = new ErrorResponse(
                                 HttpStatus.NOT_FOUND.value(),
                                 ex.getMessage(),
@@ -22,12 +22,22 @@ public class GlobalExceptionHandler {
         }
 
         @ExceptionHandler(BadRequestException.class)
-        public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
+        public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
                 ErrorResponse error = new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
                                 ex.getMessage(),
                                 LocalDateTime.now());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        @ExceptionHandler(DuplicateResourceException.class)
+        public ResponseEntity<ErrorResponse> handleDuplicateResourceException(DuplicateResourceException ex) {
+            ErrorResponse error = new ErrorResponse(
+                    HttpStatus.BAD_REQUEST.value(),
+                    ex.getMessage(),
+                    LocalDateTime.now()
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
         @ExceptionHandler(MethodArgumentNotValidException.class)

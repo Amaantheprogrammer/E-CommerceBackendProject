@@ -1,10 +1,12 @@
 package com.myProject.product.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.myProject.product.dto.UpdateImageRequest;
+import com.myProject.exception.DuplicateResourceException;
+import com.myProject.product.dto.ImageRequest;
 import com.myProject.product.entity.ProductImage;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -56,8 +58,7 @@ public class ProductService {
     public ProductResponse getProductById(Long id) {
         log.info(">>> Fetching product with ID: " + id);
         simulateSlowDbCall();
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        Product product = getProductOrThrow(id);
         return modelMapper.map(product, ProductResponse.class);
     }
 
@@ -131,8 +132,7 @@ public class ProductService {
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
     public ProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        Product product = getProductOrThrow(id);
         validateProductAuthority(product);
         if (updateProductRequest.getName() != null) {
             product.setName(updateProductRequest.getName());
@@ -159,16 +159,65 @@ public class ProductService {
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true),
             @CacheEvict(value = "myProducts", allEntries = true)
     })
-    public void updateImage(Long id, UpdateImageRequest updateImageRequest) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+    public void addImage(Long id, ImageRequest imageRequest) {
+        Product product = getProductOrThrow(id);
         validateProductAuthority(product);
-        ProductImage productImage =  product.getProductImages()
+        boolean imageExists = product.getProductImages()
                 .stream()
-                .filter(image -> image.getId().equals(updateImageRequest.getImageId()))
+                .anyMatch(image -> image.getImageUrl().equals(imageRequest.getImageUrl()));
+        if (imageExists) {
+            throw new DuplicateResourceException("Image URL already exists");
+        }
+        ProductImage newProductImage = ProductImage.builder()
+                .imageUrl(imageRequest.getImageUrl())
+                .product(product)
+                .build();
+        product.getProductImages().add(newProductImage);
+        productRepository.save(product);
+    }
+
+    @PreAuthorize("hasRole('SELLER')")
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "productsById", key = "#id"),
+            @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "myProducts", allEntries = true)
+    })
+    public void updateImage(Long id, Long imageId, ImageRequest imageRequest) {
+        Product product = getProductOrThrow(id);
+        validateProductAuthority(product);
+        ProductImage productImage = product.getProductImages()
+                .stream()
+                .filter(image -> image.getId().equals(imageId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Image not found with ID: " + updateImageRequest.getImageId()));
-        productImage.setImageUrl(updateImageRequest.getImageUrl());
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found with ID: " + imageId));
+        productImage.setImageUrl(imageRequest.getImageUrl());
+    }
+
+    @PreAuthorize("hasRole('SELLER')")
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "productsById", key = "#id"),
+            @CacheEvict(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true),
+            @CacheEvict(value = "myProducts", allEntries = true)
+    })
+    public void deleteImage(Long id, Long imageId) {
+        Product product = getProductOrThrow(id);
+        validateProductAuthority(product);
+        if (product.getProductImages().isEmpty()) {
+            return;
+        }
+
+        boolean imageRemoved = product.getProductImages()
+                .removeIf(image -> image.getId().equals(imageId));
+        if (!imageRemoved) {
+            throw new ResourceNotFoundException("Image not found with ID: " + imageId);
+        }
+        productRepository.save(product);
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -180,8 +229,7 @@ public class ProductService {
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
     public void deleteProductById(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
+        Product product = getProductOrThrow(id);
         validateProductAuthority(product);
         productRepository.deleteById(id);
     }
@@ -207,5 +255,10 @@ public class ProductService {
         if (!product.getUser().getId().equals(getCurrentUser().getId())) {
             throw new AuthorizationDeniedException("You cannot update products of other sellers");
         }
+    }
+
+    private Product getProductOrThrow(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
     }
 }
