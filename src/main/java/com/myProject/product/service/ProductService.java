@@ -49,7 +49,7 @@ public class ProductService {
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
         log.info(">>> Fetching all products from the database");
         simulateSlowDbCall();
-        return productRepository.findAllWithCategory(pageable)
+        return productRepository.findAll(pageable)
                 .map(product -> modelMapper.map(product, ProductResponse.class));
     }
 
