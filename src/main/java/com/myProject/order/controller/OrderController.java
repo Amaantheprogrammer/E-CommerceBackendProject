@@ -92,6 +92,14 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(orderRequest));
     }
 
+    @PostMapping("/cart/place-order")
+    @Operation(
+            summary = "Place order from cart"
+    )
+    public ResponseEntity<OrderResponse> placeOrderFromCart() {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrderFromCart());
+    }
+
     @PatchMapping("/{orderId}/cancel")
     @Operation(
         summary = "Cancel order"

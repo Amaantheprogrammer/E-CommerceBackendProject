@@ -16,6 +16,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.myProject.cart.entity.Cart;
+import com.myProject.cart.entity.CartItem;
+import com.myProject.cart.repository.CartItemRepository;
+import com.myProject.cart.repository.CartRepository;
 import com.myProject.exception.BadRequestException;
 import com.myProject.exception.ResourceNotFoundException;
 import com.myProject.order.dto.OrderRequest;
@@ -23,13 +27,13 @@ import com.myProject.order.dto.OrderResponse;
 import com.myProject.order.entity.Order;
 import com.myProject.order.entity.OrderItem;
 import com.myProject.order.entity.OrderStatus;
-import com.myProject.order.entity.PaymentMethod;
 import com.myProject.order.entity.PaymentStatus;
 import com.myProject.order.repository.OrderRepository;
 import com.myProject.payment.entity.BankAccount;
 import com.myProject.payment.repository.BankAccountRepository;
 import com.myProject.product.entity.Product;
 import com.myProject.product.repository.ProductRepository;
+import com.myProject.user.entity.PaymentMethod;
 import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
 
@@ -43,6 +47,8 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final BankAccountRepository bankAccountRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
     private final ModelMapper modelMapper;
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -118,7 +124,7 @@ public class OrderService {
                         -> new ResourceNotFoundException(
                         "Product not found with ID: " + productId));
         Integer quantity = orderRequest.getQuantity();
-        PaymentMethod paymentMethod = orderRequest.getPaymentMethod();
+        PaymentMethod paymentMethod = user.getPaymentMethod();
         Integer stockQuantity = product.getStockQuantity();
         if (stockQuantity < quantity) {
             throw new BadRequestException("Insufficient stock for product: " + product.getName());
@@ -138,7 +144,6 @@ public class OrderService {
         Order order = Order.builder()
                 .user(user)
                 .totalAmount(totalAmount)
-                .paymentMethod(paymentMethod)
                 .orderDate(LocalDateTime.now())
                 .orderStatus(OrderStatus.PENDING)
                 .paymentStatus(
@@ -163,6 +168,88 @@ public class OrderService {
         return modelMapper.map(orderRepository.save(order), OrderResponse.class);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'USER')")
+    @Transactional
+    public OrderResponse placeOrderFromCart() {
+        User user = getCurrentUser();
+        Cart cart = user.getCart();
+        if (cart == null || cart.getCartItems().isEmpty()) {
+            throw new BadRequestException("Order cannot be placed with an empty cart");
+        }
+        List<CartItem> cartItems = cart.getCartItems();
+        PaymentMethod paymentMethod = user.getPaymentMethod();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        // Validate stock and calculate total amount
+        for (CartItem cartItem : cartItems) {
+            Product product = cartItem.getProduct();
+            if (product.getStockQuantity() < cartItem.getQuantity()) {
+                throw new BadRequestException(
+                        "Insufficient stock for product: " + product.getName()
+                );
+            }
+            totalAmount = totalAmount.add(
+                    product.getPrice()
+                            .multiply(BigDecimal.valueOf(cartItem.getQuantity()))
+            );
+        }
+
+        // ---------- Validate Payment ----------
+        BankAccount bankAccount = null;
+        if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
+            bankAccount = bankAccountRepository.findByUser_Id(user.getId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Bank account not found"));
+            if (bankAccount.getBalance().compareTo(totalAmount) < 0) {
+                throw new BadRequestException("Insufficient balance in account");
+            }
+            bankAccount.setBalance(
+                    bankAccount.getBalance().subtract(totalAmount)
+            );
+            bankAccountRepository.save(bankAccount);
+        }
+
+        // ---------- Create Order ----------
+        Order order = Order.builder()
+                .user(user)
+                .address(user.getAddress())
+                .paymentMethod(paymentMethod)
+                .orderDate(LocalDateTime.now())
+                .totalAmount(totalAmount)
+                .orderStatus(
+                        paymentMethod == PaymentMethod.BANK_TRANSFER
+                                ? OrderStatus.PLACED
+                                : OrderStatus.PENDING
+                )
+                .paymentStatus(
+                        paymentMethod == PaymentMethod.BANK_TRANSFER
+                                ? PaymentStatus.PAID
+                                : PaymentStatus.PENDING
+                )
+                .orderItems(new ArrayList<>())
+                .build();
+
+        // ---------- Create Order Items & Update Stock ----------
+
+        for (CartItem cartItem : cartItems) {
+            Product product = cartItem.getProduct();
+            product.setStockQuantity(
+                    product.getStockQuantity() - cartItem.getQuantity()
+            );
+            productRepository.save(product);
+            OrderItem orderItem = OrderItem.builder()
+                    .order(order)
+                    .product(product)
+                    .quantity(cartItem.getQuantity())
+                    .priceAtPurchase(product.getPrice())
+                    .build();
+            order.getOrderItems().add(orderItem);
+        }
+        Order savedOrder = orderRepository.save(order);
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
+        return modelMapper.map(savedOrder, OrderResponse.class);
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public void cancelOrder(Long orderId) {
@@ -182,7 +269,7 @@ public class OrderService {
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
             productRepository.save(product);
         });
-        if (order.getPaymentStatus() == PaymentStatus.PAID && order.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
+        if (order.getPaymentStatus() == PaymentStatus.PAID && currentUser.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
             BankAccount bankAccount = bankAccountRepository.findByUser_Id(currentUser.getId())
                             .orElseThrow(()-> new ResourceNotFoundException("Bank account not found"));
 

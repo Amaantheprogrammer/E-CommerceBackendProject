@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.myProject.user.entity.PaymentMethod;
 import com.myProject.user.entity.User;
 
 import jakarta.persistence.CascadeType;
@@ -68,6 +69,9 @@ public class Order {
     @Column(name = "payment_status", nullable = false)
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    @Column(nullable = false)
+    private String address;
 
     public Order orElseThrow(Object object) {
         // TODO Auto-generated method stub

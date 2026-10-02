@@ -2,6 +2,7 @@ package com.myProject.order.dto;
 
 import com.myProject.order.entity.PaymentMethod;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,6 @@ public class OrderRequest {
     private Long productId;
     @NotNull(message = "Quantity is required")
     private Integer quantity;
-    @NotNull(message = "Payment method is required")
-    private PaymentMethod paymentMethod;
+    @NotBlank(message = "Address is required")
+    private String address;
 }

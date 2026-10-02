@@ -48,6 +48,9 @@ public class User {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
+    @Column(nullable = true)
+    private String address;
+
     @OneToOne(mappedBy = "user") 
     private BankAccount bankAccount;
 
