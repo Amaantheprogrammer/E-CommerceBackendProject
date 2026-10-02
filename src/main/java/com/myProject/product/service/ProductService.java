@@ -1,13 +1,9 @@
 package com.myProject.product.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.myProject.exception.DuplicateResourceException;
-import com.myProject.product.dto.ImageRequest;
-import com.myProject.product.entity.ProductImage;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,11 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.myProject.category.repository.CategoryRepository;
+import com.myProject.exception.DuplicateResourceException;
 import com.myProject.exception.ResourceNotFoundException;
+import com.myProject.product.dto.ImageRequest;
 import com.myProject.product.dto.NewProductRequest;
 import com.myProject.product.dto.ProductResponse;
 import com.myProject.product.dto.UpdateProductRequest;
 import com.myProject.product.entity.Product;
+import com.myProject.product.entity.ProductImage;
 import com.myProject.product.repository.ProductRepository;
 import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
@@ -49,7 +48,7 @@ public class ProductService {
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
         log.info(">>> Fetching all products from the database");
         simulateSlowDbCall();
-        return productRepository.findAll(pageable)
+        return productRepository.findAllProducts(pageable)
                 .map(product -> modelMapper.map(product, ProductResponse.class));
     }
 

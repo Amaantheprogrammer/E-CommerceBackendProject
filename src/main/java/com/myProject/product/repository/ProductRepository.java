@@ -15,7 +15,7 @@ import com.myProject.product.entity.Product;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @EntityGraph(attributePaths = {"category", "productImages"})
-    Page<Product> findAll(Pageable pageable);
+    Page<Product> findAllProducts(Pageable pageable);
     
     @Query("SELECT p FROM Product p JOIN FETCH p.category WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<Product> findByNameContainingIgnoreCase(@Param("name") String name);

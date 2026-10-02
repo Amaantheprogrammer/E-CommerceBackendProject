@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.myProject.cart.entity.Cart;
 import com.myProject.cart.entity.CartItem;
-import com.myProject.cart.repository.CartItemRepository;
 import com.myProject.cart.repository.CartRepository;
 import com.myProject.exception.BadRequestException;
 import com.myProject.exception.ResourceNotFoundException;
@@ -48,7 +47,6 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final BankAccountRepository bankAccountRepository;
     private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
     private final ModelMapper modelMapper;
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -194,9 +192,8 @@ public class OrderService {
         }
 
         // ---------- Validate Payment ----------
-        BankAccount bankAccount = null;
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
-            bankAccount = bankAccountRepository.findByUser_Id(user.getId())
+            BankAccount bankAccount = bankAccountRepository.findByUser_Id(user.getId())
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Bank account not found"));
             if (bankAccount.getBalance().compareTo(totalAmount) < 0) {
