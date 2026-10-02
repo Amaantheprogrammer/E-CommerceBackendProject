@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.myProject.order.entity.OrderStatus;
-import com.myProject.order.entity.PaymentMethod;
+import com.myProject.user.entity.PaymentMethod;
 import com.myProject.order.entity.PaymentStatus;
 
 import lombok.AllArgsConstructor;
