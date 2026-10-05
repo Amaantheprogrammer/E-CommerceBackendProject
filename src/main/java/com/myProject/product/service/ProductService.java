@@ -46,7 +46,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     @Cacheable(value = "products")
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
-        log.info(">>> Fetching all products from the database");
+        log.info("Fetching all products from the database");
         simulateSlowDbCall();
         return productRepository.findAllProducts(pageable)
                 .map(product -> modelMapper.map(product, ProductResponse.class));
@@ -55,7 +55,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     @Cacheable(value = "productsById", key = "#id")
     public ProductResponse getProductById(Long id) {
-        log.info(">>> Fetching product with ID: " + id);
+        log.info("Fetching product with ID: {}", id);
         simulateSlowDbCall();
         Product product = getProductOrThrow(id);
         return modelMapper.map(product, ProductResponse.class);
@@ -64,7 +64,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     @Cacheable(value = "productsByNameContainingIgnoreCaseAndPriceLessThan", key = "#name + '_' + #price")
     public List<ProductResponse> getProductByNameContainingIgnoreCaseAndPriceLessThan(String name, BigDecimal price) {
-        log.info(">>> Fetching product with name: " + name + " and price: " + price);
+        log.info("Fetching product with name: {} and price: {}", name, price);
         simulateSlowDbCall();
         List<Product> products = (price != null)
                 ? productRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price)
@@ -77,7 +77,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     @Cacheable(value = "productsByCategoryIdAndPriceLessThan", key = "#id + '_' + #price")
     public List<ProductResponse> getProductsByCategoryIdAndPriceLessThan(Long id, BigDecimal price) {
-        log.info(">>> Fetching product with id: " + id + " and price: " + price);
+        log.info("Fetching product with id: {} and price: {}", id, price);
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category not found with ID: " + id);
         }
@@ -108,7 +108,9 @@ public class ProductService {
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
     public ProductResponse createNewProduct(NewProductRequest newProductRequest) {
-        log.info("Creating product with name: " + newProductRequest.getName());
+        if (log.isInfoEnabled()) {
+            log.info("Creating product with name: {}", newProductRequest.getName());
+        }
         simulateSlowDbCall();
         // Check if category exists by id
         if (!categoryRepository.existsById(newProductRequest.getCategoryId())) {
@@ -210,7 +212,6 @@ public class ProductService {
         if (product.getProductImages().isEmpty()) {
             return;
         }
-
         boolean imageRemoved = product.getProductImages()
                 .removeIf(image -> image.getId().equals(imageId));
         if (!imageRemoved) {

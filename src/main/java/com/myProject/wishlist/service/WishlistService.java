@@ -1,5 +1,6 @@
 package com.myProject.wishlist.service;
 
+import com.myProject.exception.DuplicateResourceException;
 import com.myProject.exception.ResourceNotFoundException;
 import com.myProject.product.entity.Product;
 import com.myProject.product.repository.ProductRepository;
@@ -39,7 +40,7 @@ public class WishlistService {
         boolean productExists = wishlist.getWishlistItems().stream()
                 .anyMatch(item -> item.getProduct().getId().equals(productId));
         if (productExists) {
-            return modelMapper.map(wishlist, WishlistResponse.class);
+            throw new DuplicateResourceException("Product already exists with ID: " + productId);
         }
         WishlistItem wishlistItem = WishlistItem.builder()
                 .wishlist(wishlist)
