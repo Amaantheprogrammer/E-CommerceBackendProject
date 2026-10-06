@@ -1,10 +1,13 @@
 package com.myProject.service;
 
+import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,10 +18,13 @@ public class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Disabled
-    @Test
-    void testFindByEmail() {
-        assertTrue(userRepository.existsByEmail("admin@ecommerce.com"));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "admin@ecommerce.com",
+            "josephstarc1@gmail.com"
+    })
+    void testFindByEmail(String email) {
+        assertTrue(userRepository.existsByEmail(email), "Failed for: " + email);
     }
 
     @ParameterizedTest
@@ -26,7 +32,13 @@ public class UserServiceTest {
             "2, 1, 1",
             "5, 3, 2"
     })
-    void test(Integer expected, Integer a, Integer b) {
+    void testAddition(int expected, int a, int b) {
         assertEquals(expected, a + b);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserArgumentProvider.class)
+    void testFindByEmail(User user) {
+        assertTrue(userRepository.existsByEmail(user.getEmail()), "Failed for: " + user.getEmail());
     }
 }
