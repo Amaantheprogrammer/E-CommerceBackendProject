@@ -18,6 +18,6 @@ public class OrderRequest {
     private Integer quantity;
     @NotBlank(message = "Address is required")
     private String address;
-    @NotBlank(message = "Account number is required")
+    // Can be blank for Orders with Cash On Delivery payment method
     private String accountNumber;
 }

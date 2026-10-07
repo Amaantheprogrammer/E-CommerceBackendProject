@@ -3,6 +3,7 @@ package com.myProject.user.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.myProject.security.user.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +29,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final CurrentUserUtil currentUserUtil;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
@@ -60,7 +62,7 @@ public class UserService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     public UserResponse getMyUser() {
-        return modelMapper.map(getCurrentUser(), UserResponse.class);
+        return modelMapper.map(currentUserUtil.getCurrentUser(), UserResponse.class);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
@@ -71,7 +73,7 @@ public class UserService {
         @CacheEvict(value = "usersByEmail", allEntries = true)
     })
     public UserResponse updateMyUser(UpdateUserRequest updateUserRequest) {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         if (updateUserRequest.getName() != null) {
             user.setName(updateUserRequest.getName());
         }
@@ -93,14 +95,8 @@ public class UserService {
         @CacheEvict(value = "usersByEmail", allEntries = true)
     })
     public void deleteMyUser() {
-        Long currentUserId = getCurrentUser().getId();
+        Long currentUserId = currentUserUtil.getCurrentUser().getId();
         userRepository.deleteById(currentUserId);
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-    }
 }
