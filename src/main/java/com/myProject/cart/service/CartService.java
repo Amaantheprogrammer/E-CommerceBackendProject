@@ -5,8 +5,6 @@ import java.util.Optional;
 import com.myProject.security.user.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +17,6 @@ import com.myProject.exception.ResourceNotFoundException;
 import com.myProject.product.entity.Product;
 import com.myProject.product.repository.ProductRepository;
 import com.myProject.user.entity.User;
-import com.myProject.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

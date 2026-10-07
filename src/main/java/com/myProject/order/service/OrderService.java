@@ -2,8 +2,7 @@ package com.myProject.order.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import com.myProject.rest_client.dto.AccountResponse;
 import com.myProject.rest_client.dto.TransactionRequest;
@@ -14,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +32,6 @@ import com.myProject.product.entity.Product;
 import com.myProject.product.repository.ProductRepository;
 import com.myProject.user.entity.PaymentMethod;
 import com.myProject.user.entity.User;
-import com.myProject.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -132,6 +128,9 @@ public class OrderService {
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
             if (digitalBankingClientService.getMyAccounts().isEmpty()) {
                 throw new ResourceNotFoundException("No active bank account for the user");
+            }
+            if (orderRequest.getAccountNumber() == null) {
+                throw new ResourceNotFoundException("No account number found");
             }
             AccountResponse account = digitalBankingClientService.getAccountByNumber(orderRequest.getAccountNumber());
             if (account.getBalance().compareTo(totalAmount) < 0) {
