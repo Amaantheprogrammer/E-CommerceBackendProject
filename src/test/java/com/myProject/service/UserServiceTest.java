@@ -2,8 +2,6 @@ package com.myProject.service;
 
 import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;

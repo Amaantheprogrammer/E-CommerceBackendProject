@@ -18,4 +18,6 @@ public class OrderRequest {
     private Integer quantity;
     @NotBlank(message = "Address is required")
     private String address;
+    @NotBlank(message = "Account number is required")
+    private String accountNumber;
 }

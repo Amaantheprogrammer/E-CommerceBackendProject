@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import com.myProject.rest_client.dto.AccountResponse;
+import com.myProject.rest_client.dto.TransactionRequest;
+import com.myProject.rest_client.service.DigitalBankingClientService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +30,6 @@ import com.myProject.order.entity.OrderItem;
 import com.myProject.order.entity.OrderStatus;
 import com.myProject.order.entity.PaymentStatus;
 import com.myProject.order.repository.OrderRepository;
-import com.myProject.payment.entity.BankAccount;
-import com.myProject.payment.repository.BankAccountRepository;
 import com.myProject.product.entity.Product;
 import com.myProject.product.repository.ProductRepository;
 import com.myProject.user.entity.PaymentMethod;
@@ -45,9 +45,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final BankAccountRepository bankAccountRepository;
     private final CartRepository cartRepository;
     private final ModelMapper modelMapper;
+    private final DigitalBankingClientService digitalBankingClientService;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
@@ -129,15 +129,18 @@ public class OrderService {
         }
         BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
-            BankAccount bankAccount = bankAccountRepository.findByUser_Id(user.getId())
-                            .orElseThrow(()-> new ResourceNotFoundException("Bank account not found for user"));
-            if (bankAccount.getBalance().compareTo(totalAmount) < 0) {
+            if (digitalBankingClientService.getMyAccounts().isEmpty()) {
+                throw new ResourceNotFoundException("No active bank account for the user");
+            }
+            AccountResponse account = digitalBankingClientService.getAccountByNumber(orderRequest.getAccountNumber());
+            if (account.getBalance().compareTo(totalAmount) < 0) {
                 throw new BadRequestException("Insufficient balance in the account");
             }
-
-            bankAccount.setBalance(bankAccount.getBalance().subtract(totalAmount));
-
-            bankAccountRepository.save(bankAccount);
+            TransactionRequest withdrawRequest = TransactionRequest.builder()
+                    .accountNumber(orderRequest.getAccountNumber())
+                    .amount(totalAmount)
+                    .build();
+            digitalBankingClientService.withdraw(withdrawRequest);
         }
         Order order = Order.builder()
                 .user(user)
@@ -190,22 +193,23 @@ public class OrderService {
                             .multiply(BigDecimal.valueOf(cartItem.getQuantity()))
             );
         }
-
-        // ---------- Validate Payment ----------
+        // Validate Payment
         if (paymentMethod == PaymentMethod.BANK_TRANSFER) {
-            BankAccount bankAccount = bankAccountRepository.findByUser_Id(user.getId())
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException("Bank account not found"));
-            if (bankAccount.getBalance().compareTo(totalAmount) < 0) {
+            List<AccountResponse> accounts = digitalBankingClientService.getMyAccounts();
+            if (accounts.isEmpty()) {
+                throw new ResourceNotFoundException("No active bank account found for user");
+            }
+            AccountResponse primaryAccount = accounts.get(0);
+            if (primaryAccount.getBalance().compareTo(totalAmount) < 0) {
                 throw new BadRequestException("Insufficient balance in account");
             }
-            bankAccount.setBalance(
-                    bankAccount.getBalance().subtract(totalAmount)
-            );
-            bankAccountRepository.save(bankAccount);
+            TransactionRequest withdrawRequest = TransactionRequest.builder()
+                    .accountNumber(primaryAccount.getAccountNumber())
+                    .amount(totalAmount)
+                    .build();
+            digitalBankingClientService.withdraw(withdrawRequest);
         }
-
-        // ---------- Create Order ----------
+        // Create Order
         Order order = Order.builder()
                 .user(user)
                 .address(user.getAddress())
@@ -225,8 +229,7 @@ public class OrderService {
                 .orderItems(new ArrayList<>())
                 .build();
 
-        // ---------- Create Order Items & Update Stock ----------
-
+        // Create Order Items & Update Stock
         for (CartItem cartItem : cartItems) {
             Product product = cartItem.getProduct();
             product.setStockQuantity(
@@ -267,12 +270,16 @@ public class OrderService {
             productRepository.save(product);
         });
         if (order.getPaymentStatus() == PaymentStatus.PAID && currentUser.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
-            BankAccount bankAccount = bankAccountRepository.findByUser_Id(currentUser.getId())
-                            .orElseThrow(()-> new ResourceNotFoundException("Bank account not found"));
-
-            bankAccount.setBalance(bankAccount.getBalance().add(order.getTotalAmount()));
-
-            bankAccountRepository.save(bankAccount);
+            List<AccountResponse> accounts = digitalBankingClientService.getMyAccounts();
+            if (accounts.isEmpty()) {
+                throw new ResourceNotFoundException("No active bank account found for user");
+            }
+            AccountResponse primaryAccount = accounts.get(0);
+            TransactionRequest depositRequest = TransactionRequest.builder()
+                    .accountNumber(primaryAccount.getAccountNumber())
+                    .amount(order.getTotalAmount())
+                    .build();
+            digitalBankingClientService.deposit(depositRequest);
         }
 
         order.setOrderStatus(OrderStatus.CANCELLED);
