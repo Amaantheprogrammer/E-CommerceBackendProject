@@ -106,6 +106,11 @@ public class ProductService {
         // Convert NewProductDto to Product
         Product product = modelMapper.map(newProductRequest, Product.class);
         product.setUser(currentUserUtil.getCurrentUser());
+        ProductImage image = ProductImage.builder()
+                .imageUrl(newProductRequest.getImageUrl())
+                .product(product)
+                .build();
+        product.getProductImages().add(image);
         // Save in database as product and return productDto
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
