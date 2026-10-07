@@ -4,6 +4,7 @@ import com.myProject.exception.DuplicateResourceException;
 import com.myProject.exception.ResourceNotFoundException;
 import com.myProject.product.entity.Product;
 import com.myProject.product.repository.ProductRepository;
+import com.myProject.security.user.CurrentUserUtil;
 import com.myProject.user.entity.User;
 import com.myProject.user.repository.UserRepository;
 import com.myProject.wishlist.dto.WishlistResponse;
@@ -22,9 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
-    private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
+    private final CurrentUserUtil currentUserUtil;
 
     @Transactional
     public WishlistResponse getMyWishlist() {
@@ -56,7 +57,7 @@ public class WishlistService {
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product not found with ID: " + productId);
         }
-        Wishlist wishlist = getCurrentUser().getWishlist();
+        Wishlist wishlist = currentUserUtil.getCurrentUser().getWishlist();
         wishlist.getWishlistItems().removeIf(
                 wishlistItem -> wishlistItem.getProduct().getId().equals(productId)
         );
@@ -73,15 +74,9 @@ public class WishlistService {
         wishlistRepository.save(wishlist);
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-    }
-
+    // Private method
     private Wishlist getOrCreateWishlist() {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         Wishlist wishlist = user.getWishlist();
         if (wishlist == null) {
             wishlist = Wishlist.builder()

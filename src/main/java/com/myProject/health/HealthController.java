@@ -8,10 +8,9 @@ import lombok.RequiredArgsConstructor;
 @RestController 
 @RequiredArgsConstructor
 public class HealthController {
-    private final HealthService healthService;
     @GetMapping("/")
     public String healthCheck() {
-        return healthService.healthCheck();
+        return "E-Commerce Backend Application is running";
     }
     
 }

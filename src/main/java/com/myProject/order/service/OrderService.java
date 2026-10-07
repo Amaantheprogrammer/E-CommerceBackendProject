@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.myProject.rest_client.dto.AccountResponse;
 import com.myProject.rest_client.dto.TransactionRequest;
 import com.myProject.rest_client.service.DigitalBankingClientService;
+import com.myProject.security.user.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,11 +44,11 @@ import lombok.RequiredArgsConstructor;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
     private final ModelMapper modelMapper;
     private final DigitalBankingClientService digitalBankingClientService;
+    private final CurrentUserUtil currentUserUtil;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
@@ -76,7 +77,7 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     public List<OrderResponse> getMyOrders() {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         List<Order> orders = user.getOrders();
         return orders.stream()
                     .map(order -> modelMapper.map(order, OrderResponse.class))
@@ -115,7 +116,7 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public OrderResponse placeOrder(OrderRequest orderRequest) {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         Long productId = orderRequest.getProductId();
         Product product = productRepository.findById(productId)
                 .orElseThrow(()
@@ -172,7 +173,7 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'USER')")
     @Transactional
     public OrderResponse placeOrderFromCart() {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         Cart cart = user.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) {
             throw new BadRequestException("Order cannot be placed with an empty cart");
@@ -253,7 +254,7 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public void cancelOrder(Long orderId) {
-        User currentUser = getCurrentUser();
+        User currentUser = currentUserUtil.getCurrentUser();
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()-> new ResourceNotFoundException("Order not found with ID: " + orderId));
 
@@ -289,15 +290,9 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
-    }
-
+    // Private method
     private void validateOrderAuthority(Order order) {
-        Long currentUserId = getCurrentUser().getId();
+        Long currentUserId = currentUserUtil.getCurrentUser().getId();
         order.getOrderItems().forEach(item -> {
             if (!item.getProduct().getUser().getId().equals(currentUserId)) {
                 throw new AuthorizationDeniedException("You cannot update orders containing products owned by another seller");

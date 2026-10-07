@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.myProject.security.user.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,8 +41,8 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final CurrentUserUtil currentUserUtil;
 
     @Transactional(readOnly = true)
     @Cacheable(value = "products")
@@ -86,7 +87,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     @Cacheable(value = "myProducts", key = "authentication.name")
     public List<ProductResponse> getMyProducts() {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         List<Product> products = user.getProducts();
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductResponse.class))
@@ -107,7 +108,7 @@ public class ProductService {
         }
         // Convert NewProductDto to Product
         Product product = modelMapper.map(newProductRequest, Product.class);
-        product.setUser(getCurrentUser());
+        product.setUser(currentUserUtil.getCurrentUser());
         // Save in database as product and return productDto
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
@@ -224,15 +225,8 @@ public class ProductService {
     }
 
     // Private methods
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-    }
-
     private void validateProductAuthority(Product product) {
-        if (!product.getUser().getId().equals(getCurrentUser().getId())) {
+        if (!product.getUser().getId().equals(currentUserUtil.getCurrentUser().getId())) {
             throw new AuthorizationDeniedException("You cannot update products of other sellers");
         }
     }

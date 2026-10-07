@@ -2,6 +2,7 @@ package com.myProject.cart.service;
 
 import java.util.Optional;
 
+import com.myProject.security.user.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -27,14 +28,14 @@ import lombok.RequiredArgsConstructor;
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
+    private final CurrentUserUtil currentUserUtil;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN', 'USER', 'SELLER')")
     @Transactional(readOnly = true)
     public CartResponse getMyCart() {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         Cart cart = user.getCart();
         if (cart == null) {
             cart = Cart.builder().user(user).build();
@@ -46,7 +47,7 @@ public class CartService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER','SELLER')")
     @Transactional
     public CartResponse updateItemQuantity(Long productId, Integer quantity) {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
         Cart cart = user.getCart();
@@ -88,7 +89,7 @@ public class CartService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER','SELLER')")
     @Transactional
     public CartResponse removeProductFromCart(Long productId) {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product not found with ID: " + productId);
         }     
@@ -110,17 +111,10 @@ public class CartService {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER','SELLER')")
     @Transactional
     public void clearCart() {
-        User user = getCurrentUser();
+        User user = currentUserUtil.getCurrentUser();
         Cart cart = user.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) return;
         cart.getCartItems().clear();
         cartRepository.save(cart);
-    }
-
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 }
