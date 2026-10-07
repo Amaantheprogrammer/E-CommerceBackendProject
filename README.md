@@ -369,9 +369,6 @@ This project demonstrates:
 - Refresh Tokens
 - Email Verification
 - Password Reset
-- Wishlist
-- Product Images
-- Swagger/OpenAPI Documentation
 - Unit Testing
 - Integration Testing
 - CI/CD Pipeline
