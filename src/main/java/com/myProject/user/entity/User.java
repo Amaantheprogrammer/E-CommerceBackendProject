@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.myProject.cart.entity.Cart;
 import com.myProject.order.entity.Order;
-import com.myProject.payment.entity.BankAccount;
 import com.myProject.product.entity.Product;
 
 import com.myProject.wishlist.entity.Wishlist;
@@ -50,9 +49,6 @@ public class User {
 
     @Column(nullable = true)
     private String address;
-
-    @OneToOne(mappedBy = "user") 
-    private BankAccount bankAccount;
 
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
