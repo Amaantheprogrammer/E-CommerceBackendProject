@@ -92,6 +92,7 @@ A secure, highly scalable enterprise-grade e-commerce backend built with **Sprin
 ```text
 src/main/java/com/myProject
 
+├── admin_seeder
 ├── auth
 ├── cart
 ├── category
@@ -99,6 +100,7 @@ src/main/java/com/myProject
 ├── payment
 ├── product
 ├── user
+├── rest_client
 │
 ├── security
 │   ├── jwt
@@ -108,9 +110,8 @@ src/main/java/com/myProject
 │
 ├── exception
 │
-├── audit
-│
 ├── health
+├── wishlist
 │
 └── ECommerceBackendProjectApplication
 ```
@@ -374,7 +375,6 @@ This project demonstrates:
 - Unit Testing
 - Integration Testing
 - CI/CD Pipeline
-- Payment Gateway Integration
 - Inventory Management
 
 ---
