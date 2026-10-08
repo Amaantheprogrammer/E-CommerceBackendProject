@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NewCategoryRequest {
+public class CategoryRequest {
     @NotBlank(message = "Name field is required")
     private String name;
 }

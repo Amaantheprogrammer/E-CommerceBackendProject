@@ -2,19 +2,13 @@ package com.myProject.category.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.myProject.category.dto.CategoryResponse;
-import com.myProject.category.dto.NewCategoryRequest;
+import com.myProject.category.dto.CategoryRequest;
 import com.myProject.category.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -36,15 +30,20 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<CategoryResponse>> getCategoryByNameContainingIgnoreCase(@RequestParam String name) {
+        return ResponseEntity.ok(categoryService.getCategoryByNameContainingIgnoreCase(name));
+    }
     
     @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody NewCategoryRequest newCategoryRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(newCategoryRequest));
+    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(categoryRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody NewCategoryRequest newCategoryRequest) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, newCategoryRequest));
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest categoryRequest) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, categoryRequest));
     }
     
     @DeleteMapping("/{id}")

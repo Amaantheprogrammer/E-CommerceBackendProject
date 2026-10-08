@@ -2,6 +2,7 @@ package com.myProject.auth.controller;
 
 import com.myProject.auth.dto.SignupRequest;
 import com.myProject.auth.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,13 +23,13 @@ public class AuthController {
 
     // Sign-in
     @PostMapping("/sign-in")
-    public ResponseEntity<AuthResponse> signIn(@RequestBody SignInRequest request) {
+    public ResponseEntity<AuthResponse> signIn(@Valid @RequestBody SignInRequest request) {
         return ResponseEntity.ok(authService.signIn(request));
     }
     
     // Sign-up
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUp(@RequestBody SignupRequest request) {
+    public ResponseEntity<Void> signUp(@Valid @RequestBody SignupRequest request) {
         authService.signUp(request);
         return ResponseEntity.noContent().build();
     }
