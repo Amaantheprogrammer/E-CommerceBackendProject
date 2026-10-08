@@ -81,7 +81,7 @@ public class ProductController {
         summary = "Create new product",
         description = "Create new product by taking NewProductRequest object in the request body"
     )
-    public ResponseEntity<ProductResponse> createNewProduct(@RequestBody NewProductRequest newProductRequest) {
+    public ResponseEntity<ProductResponse> createNewProduct(@Valid @RequestBody NewProductRequest newProductRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createNewProduct(newProductRequest));
     }
 

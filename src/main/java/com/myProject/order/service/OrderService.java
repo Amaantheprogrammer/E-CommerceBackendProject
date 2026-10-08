@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.myProject.order.dto.OrderStatusUpdateRequest;
+import com.myProject.order.dto.PaymentStatusUpdateRequest;
 import com.myProject.rest_client.dto.AccountResponse;
 import com.myProject.rest_client.dto.TransactionRequest;
 import com.myProject.rest_client.service.DigitalBankingClientService;
@@ -82,29 +85,29 @@ public class OrderService {
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
-    public OrderResponse updateOrderStatus(Long orderId, OrderStatus orderStatus) {
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatusUpdateRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         validateOrderAuthority(order);
-        if (orderStatus == OrderStatus.SHIPPED && order.getPaymentStatus() == PaymentStatus.FAILED) {
+        if (request.getOrderStatus() == OrderStatus.SHIPPED && order.getPaymentStatus() == PaymentStatus.FAILED) {
             throw new BadRequestException("Cannot ship an order with payment status " + order.getPaymentStatus() 
-            + " and order status " + orderStatus);
+            + " and order status " + request.getOrderStatus());
         }
-        order.setOrderStatus(orderStatus);
+        order.setOrderStatus(request.getOrderStatus());
         Order savedOrder = orderRepository.save(order);
         return modelMapper.map(savedOrder, OrderResponse.class);
     }
 
     @PreAuthorize("hasRole('SELLER')")
     @Transactional
-    public OrderResponse updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
+    public OrderResponse updatePaymentStatus(Long orderId, PaymentStatusUpdateRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         validateOrderAuthority(order);
-        if (paymentStatus == PaymentStatus.PAID && order.getOrderStatus() == OrderStatus.PENDING) {
+        if (request.getPaymentStatus() == PaymentStatus.PAID && order.getOrderStatus() == OrderStatus.PENDING) {
             order.setOrderStatus(OrderStatus.PLACED);
         }
-        order.setPaymentStatus(paymentStatus);
+        order.setPaymentStatus(request.getPaymentStatus());
         Order savedOrder = orderRepository.save(order);
         return modelMapper.map(savedOrder, OrderResponse.class);
     }
@@ -199,7 +202,7 @@ public class OrderService {
             if (accounts.isEmpty()) {
                 throw new ResourceNotFoundException("No active bank account found for user");
             }
-            AccountResponse primaryAccount = accounts.get(0);
+            AccountResponse primaryAccount = accounts.getFirst();
             if (primaryAccount.getBalance().compareTo(totalAmount) < 0) {
                 throw new BadRequestException("Insufficient balance in account");
             }
@@ -274,7 +277,7 @@ public class OrderService {
             if (accounts.isEmpty()) {
                 throw new ResourceNotFoundException("No active bank account found for user");
             }
-            AccountResponse primaryAccount = accounts.get(0);
+            AccountResponse primaryAccount = accounts.getFirst();
             TransactionRequest depositRequest = TransactionRequest.builder()
                     .accountNumber(primaryAccount.getAccountNumber())
                     .amount(order.getTotalAmount())

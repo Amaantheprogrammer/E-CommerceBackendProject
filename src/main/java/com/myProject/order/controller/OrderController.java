@@ -2,6 +2,9 @@ package com.myProject.order.controller;
 
 import java.util.List;
 
+import com.myProject.order.dto.OrderStatusUpdateRequest;
+import com.myProject.order.dto.PaymentStatusUpdateRequest;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.myProject.order.dto.OrderRequest;
 import com.myProject.order.dto.OrderResponse;
-import com.myProject.order.entity.OrderStatus;
-import com.myProject.order.entity.PaymentStatus;
 import com.myProject.order.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,26 +70,32 @@ public class OrderController {
     @PatchMapping("/{orderId}/order-status")
     @Operation(
         summary = "Update order status",
-        description = "Update order status by passinf order ID in path variable and order status in the request body"
+        description = "Update order status by passing order ID in path variable and order status in the request body"
     )
-    public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatus orderStatus) {
-        return ResponseEntity.ok(orderService.updateOrderStatus(orderId, orderStatus));
+    public ResponseEntity<OrderResponse> updateOrderStatus(
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderStatusUpdateRequest request
+    ) {
+        return ResponseEntity.ok(orderService.updateOrderStatus(orderId, request));
     }
 
     @PatchMapping("/{orderId}/payment-status")
     @Operation(
         summary = "Update payment status",
-        description = "Update payment status by passinf order ID in path variable and payment status in the request body"
+        description = "Update payment status by passing order ID in path variable and payment status in the request body"
     )
-    public ResponseEntity<OrderResponse> updatePaymentStatus(@PathVariable Long orderId, @RequestBody PaymentStatus paymentStatus) {
-        return ResponseEntity.ok(orderService.updatePaymentStatus(orderId, paymentStatus));
+    public ResponseEntity<OrderResponse> updatePaymentStatus(
+            @PathVariable Long orderId,
+            @Valid @RequestBody PaymentStatusUpdateRequest request
+            ) {
+        return ResponseEntity.ok(orderService.updatePaymentStatus(orderId, request));
     }
 
     @PostMapping("/place-order")
     @Operation(
         summary = "Place order"
     )
-    public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest orderRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(orderRequest));
     }
 
