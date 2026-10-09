@@ -103,6 +103,7 @@ public class ProductService {
         Category category = categoryRepository.findById(newProductRequest.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + newProductRequest.getCategoryId()));
         Product product = modelMapper.map(newProductRequest, Product.class);
+        product.setId(null);
         product.setUser(currentUserUtil.getCurrentUser());
         product.setCategory(category);
         ProductImage image = ProductImage.builder()
