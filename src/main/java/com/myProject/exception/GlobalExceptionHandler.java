@@ -14,30 +14,32 @@ public class GlobalExceptionHandler {
 
         @ExceptionHandler(ResourceNotFoundException.class)
         public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
-                ErrorResponse error = new ErrorResponse(
-                                HttpStatus.NOT_FOUND.value(),
-                                ex.getMessage(),
-                                LocalDateTime.now());
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            ErrorResponse error = ErrorResponse.builder()
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .message(ex.getMessage())
+                        .timestamp(LocalDateTime.now())
+                        .build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
         @ExceptionHandler(BadRequestException.class)
         public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
-                ErrorResponse error = new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                ex.getMessage(),
-                                LocalDateTime.now());
+                ErrorResponse error = ErrorResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message(ex.getMessage())
+                        .timestamp(LocalDateTime.now())
+                        .build();
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
         @ExceptionHandler(DuplicateResourceException.class)
         public ResponseEntity<ErrorResponse> handleDuplicateResourceException(DuplicateResourceException ex) {
-            ErrorResponse error = new ErrorResponse(
-                    HttpStatus.BAD_REQUEST.value(),
-                    ex.getMessage(),
-                    LocalDateTime.now()
-            );
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            ErrorResponse error = ErrorResponse.builder()
+                    .status(HttpStatus.CONFLICT.value())
+                    .message(ex.getMessage())
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         }
 
         @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -47,10 +49,11 @@ public class GlobalExceptionHandler {
                                 .stream()
                                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                                 .collect(Collectors.joining(", "));
-                ErrorResponse error = new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                message,
-                                LocalDateTime.now());
+                ErrorResponse error = ErrorResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message(ex.getMessage())
+                        .timestamp(LocalDateTime.now())
+                        .build();
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
@@ -60,10 +63,11 @@ public class GlobalExceptionHandler {
 
                 ex.printStackTrace();
 
-                ErrorResponse error = new ErrorResponse(
-                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                ex.getMessage(),
-                                LocalDateTime.now());
+                ErrorResponse error = ErrorResponse.builder()
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .message(ex.getMessage())
+                        .timestamp(LocalDateTime.now())
+                        .build();
 
                 return ResponseEntity
                                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

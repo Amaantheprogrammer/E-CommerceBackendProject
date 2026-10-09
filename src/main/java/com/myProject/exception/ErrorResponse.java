@@ -2,11 +2,10 @@ package com.myProject.exception;
 
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
+
+@Builder
 public class ErrorResponse {
     private int status;
     private String message;
