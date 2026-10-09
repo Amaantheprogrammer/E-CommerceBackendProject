@@ -145,10 +145,13 @@ public class OrderService {
                     .build();
             digitalBankingClientService.withdraw(withdrawRequest);
         }
+        System.out.println("User: " + user.getName());
+        System.out.println("Payment method retrieved: " + user.getPaymentMethod());
+        System.out.println("Payment method assigned: " + paymentMethod);
         Order order = Order.builder()
                 .user(user)
                 .seller(product.getUser())
-                .address(user.getAddress())
+                .address(orderRequest.getAddress())
                 .totalAmount(totalAmount)
                 .orderDate(LocalDateTime.now())
                 .orderStatus(OrderStatus.PENDING)
