@@ -38,6 +38,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (role != null && !role.startsWith("ROLE_")) {
                 role = "ROLE_" + role;
             }
+            System.out.println("JWT subject: " + claims.getSubject());
+            System.out.println("JWT extracted role: " + role);
             List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority(role));
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 claims.getSubject(), null, simpleGrantedAuthorities
@@ -46,6 +48,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
+            System.out.println(
+                    "Authentication authorities: "
+                            + SecurityContextHolder.getContext()
+                            .getAuthentication()
+                            .getAuthorities()
+            );
         }
         filterChain.doFilter(request, response);
     }
