@@ -159,6 +159,7 @@ public class OrderService {
                         paymentMethod == PaymentMethod.BANK_TRANSFER
                                 ? PaymentStatus.PAID
                                 : PaymentStatus.PENDING)
+                .paymentMethod(paymentMethod)
                 .orderItems(new ArrayList<>())
                 .build();
         OrderItem orderItem = OrderItem.builder()
