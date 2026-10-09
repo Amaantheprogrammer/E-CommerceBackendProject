@@ -95,7 +95,7 @@ public class OrderController {
     @Operation(
             summary = "Place order from cart"
     )
-    public ResponseEntity<OrderResponse> placeOrderFromCart() {
+    public ResponseEntity<List<OrderResponse>> placeOrderFromCart() {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrderFromCart());
     }
 
