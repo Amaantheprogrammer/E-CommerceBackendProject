@@ -147,6 +147,8 @@ public class OrderService {
         }
         Order order = Order.builder()
                 .user(user)
+                .seller(product.getUser())
+                .address(user.getAddress())
                 .totalAmount(totalAmount)
                 .orderDate(LocalDateTime.now())
                 .orderStatus(OrderStatus.PENDING)
@@ -172,7 +174,7 @@ public class OrderService {
         return modelMapper.map(orderRepository.save(order), OrderResponse.class);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public List<OrderResponse> placeOrderFromCart() {
         User user = currentUserUtil.getCurrentUser();
