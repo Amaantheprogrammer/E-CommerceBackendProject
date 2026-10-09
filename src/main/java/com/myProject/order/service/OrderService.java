@@ -112,7 +112,7 @@ public class OrderService {
         return modelMapper.map(savedOrder, OrderResponse.class);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER', 'ROLE_SELLER')")
     @Transactional
     public OrderResponse placeOrder(OrderRequest orderRequest) {
         User user = currentUserUtil.getCurrentUser();
