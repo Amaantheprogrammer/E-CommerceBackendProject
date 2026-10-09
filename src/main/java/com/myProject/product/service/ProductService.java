@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.myProject.category.entity.Category;
 import com.myProject.security.user.CurrentUserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -99,19 +100,16 @@ public class ProductService {
             @CacheEvict(value = "productsByCategoryIdAndPriceLessThan", allEntries = true)
     })
     public ProductResponse createNewProduct(NewProductRequest newProductRequest) {
-        // Check if category exists by id
-        if (!categoryRepository.existsById(newProductRequest.getCategoryId())) {
-            throw new ResourceNotFoundException("Category not found with ID: " + newProductRequest.getCategoryId());
-        }
-        // Convert NewProductDto to Product
+        Category category = categoryRepository.findById(newProductRequest.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + newProductRequest.getCategoryId()));
         Product product = modelMapper.map(newProductRequest, Product.class);
         product.setUser(currentUserUtil.getCurrentUser());
+        product.setCategory(category);
         ProductImage image = ProductImage.builder()
                 .imageUrl(newProductRequest.getImageUrl())
                 .product(product)
                 .build();
         product.getProductImages().add(image);
-        // Save in database as product and return productDto
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
