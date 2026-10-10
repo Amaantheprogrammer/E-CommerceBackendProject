@@ -20,6 +20,7 @@ import lombok.Setter;
 @Setter 
 @Table(name = "users")
 @AllArgsConstructor
+
 @NoArgsConstructor
 @Builder // Enables creating readable way to create objects
 public class User {

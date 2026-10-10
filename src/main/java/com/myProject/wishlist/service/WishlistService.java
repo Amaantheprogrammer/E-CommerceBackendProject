@@ -6,15 +6,12 @@ import com.myProject.product.entity.Product;
 import com.myProject.product.repository.ProductRepository;
 import com.myProject.security.user.CurrentUserUtil;
 import com.myProject.user.entity.User;
-import com.myProject.user.repository.UserRepository;
 import com.myProject.wishlist.dto.WishlistResponse;
 import com.myProject.wishlist.entity.Wishlist;
 import com.myProject.wishlist.entity.WishlistItem;
 import com.myProject.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
