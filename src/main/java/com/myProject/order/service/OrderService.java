@@ -112,7 +112,7 @@ public class OrderService {
         return modelMapper.map(savedOrder, OrderResponse.class);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SELLER')")
     @Transactional
     public OrderResponse placeOrder(OrderRequest orderRequest) {
         User user = currentUserUtil.getCurrentUser();
@@ -145,9 +145,6 @@ public class OrderService {
                     .build();
             digitalBankingClientService.withdraw(withdrawRequest);
         }
-        System.out.println("User: " + user.getName());
-        System.out.println("Payment method retrieved: " + user.getPaymentMethod());
-        System.out.println("Payment method assigned: " + paymentMethod);
         Order order = Order.builder()
                 .user(user)
                 .seller(product.getUser())
